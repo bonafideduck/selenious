@@ -1,0 +1,5 @@
+# These tools are required for the package and development.
+# `pip install -e .` will install all package dependencies.
+setuptools 
+wheel
+selenium
