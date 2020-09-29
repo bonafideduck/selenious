@@ -10,7 +10,11 @@ class WebDriverMixin:
     """
 
     def __init__(self, *args, **kwargs):
-        self.selenius = namedtuple("Selenius", ["timeout", "poll_frequency", "recover", "implicit_wait"])(0, 0.5, None, 0.0)
+        self._selenious = namedtuple(
+            "Selenius",
+            ["timeout", "poll_frequency", "recover", "implicit_wait", "debounce"],
+        )(0, 0.5, None, 0.0, 0.0)
+        super().__init__(*args, *args, **kwargs)
 
     def set_implicit_wait(self, time_to_wait):
         """
@@ -30,14 +34,14 @@ class WebDriverMixin:
             driver.implicitly_wait(30)
         """
         validate_time_settings(
-            time_to_wait, self.selenious.timeout, self.selenious.poll_frequency
+            time_to_wait, self._selenious.timeout, self._selenious.poll_frequency
         )
 
-        self.selenious.implicit_wait = time_to_wait
+        self._selenious.implicit_wait = time_to_wait
         return super().set_implicit_wait(time_to_wait)
 
     def set_timeout(self, timeout):
-        """Sets the default selenious timout.
+        """Sets the default _selenious timout.
 
         The selenium webdriver has an implicitly_wait() command that
         once set cannot be overwritten.  There is also a WebDriverWait()
@@ -53,10 +57,24 @@ class WebDriverMixin:
           driver.set_timeout(5)
         """
         validate_time_settings(
-            self.selenious.implicit_wait, timeout, self.selenious.poll_frequency
+            self._selenious.implicit_wait, timeout, self._selenious.poll_frequency
         )
 
         self.selenius.timeout = timeout
+
+    def set_debounce(self, debounce):
+        """Sets the wait time for a select to have not changed.
+
+        :Args:
+        - debounce - Amount to wait for find_elements_* to not change.
+          This may also be set to True which will use the poll_frequency,
+          any falsey value will disable it.  By default it is 0.
+
+        :Usage:
+          driver.debounce(1.5)
+        """
+
+        self.selenius.debounce = debounce
 
     def set_poll_frequency(self, poll_frequency):
         """Sets the frequency polling will happen for the timeout.
@@ -72,7 +90,7 @@ class WebDriverMixin:
           driver.set_poll_frequency(1.5)
         """
         validate_time_settings(
-            self.selenious.implicit_wait, self.selenious.timeout, poll_frequency
+            self._selenious.implicit_wait, self._selenious.timeout, poll_frequency
         )
 
         self.selenius.poll_frequency = poll_frequency
@@ -100,7 +118,7 @@ class WebDriverMixin:
         self.selenius.recover = recover
 
     @decorators.find_element
-    def find_element_by_id(self, **kwargs):
+    def find_element_by_id(self, *args, **kwargs):
         """Finds an element by id.
 
         :Args:
@@ -115,10 +133,10 @@ class WebDriverMixin:
         :Usage:
             element = driver.find_element_by_id('foo')
         """
-        return super().find_element_by_id(**kwargs)
+        return super().find_element_by_id(*args, **kwargs)
 
     @decorators.find_elements
-    def find_elements_by_id(self, **kwargs):
+    def find_elements_by_id(self, *args, **kwargs):
         """
         Finds multiple elements by id.
 
@@ -132,10 +150,10 @@ class WebDriverMixin:
         :Usage:
             elements = driver.find_elements_by_id('foo')
         """
-        return super().find_elements(**kwargs)
+        return super().find_elements_by_id(*args, **kwargs)
 
     @decorators.find_element
-    def find_element_by_xpath(self, **kwargs):
+    def find_element_by_xpath(self, *args, **kwargs):
         """
         Finds an element by xpath.
 
@@ -151,10 +169,10 @@ class WebDriverMixin:
         :Usage:
             element = driver.find_element_by_xpath('//div/td[1]')
         """
-        return super().find_element(**kwargs)
+        return super().find_element_by_xpath(*args, **kwargs)
 
     @decorators.find_elements
-    def find_elements_by_xpath(self, **kwargs):
+    def find_elements_by_xpath(self, *args, **kwargs):
         """
         Finds multiple elements by xpath.
 
@@ -168,9 +186,9 @@ class WebDriverMixin:
         :Usage:
             elements = driver.find_elements_by_xpath("//div[contains(@class, 'foo')]")
         """
-        return super().find_elements(**kwargs)
+        return super().find_elements_by_xpath(*args, **kwargs)
 
-    def find_element_by_link_text(self, **kwargs):
+    def find_element_by_link_text(self, *args, **kwargs):
         """
         Finds an element by link text.
 
@@ -186,10 +204,10 @@ class WebDriverMixin:
         :Usage:
             element = driver.find_element_by_link_text('Sign In')
         """
-        return super().find_element(**kwargs)
+        return super().find_element_by_link_text(*args, **kwargs)
 
     @decorators.find_elements
-    def find_elements_by_link_text(self, **kwargs):
+    def find_elements_by_link_text(self, *args, **kwargs):
         """
         Finds elements by link text.
 
@@ -203,10 +221,10 @@ class WebDriverMixin:
         :Usage:
             elements = driver.find_elements_by_link_text('Sign In')
         """
-        return super().find_elements(**kwargs)
+        return super().find_elements_by_link_text(*args, **kwargs)
 
     @decorators.find_element
-    def find_element_by_partial_link_text(self, **kwargs):
+    def find_element_by_partial_link_text(self, *args, **kwargs):
         """
         Finds an element by a partial match of its link text.
 
@@ -222,10 +240,10 @@ class WebDriverMixin:
         :Usage:
             element = driver.find_element_by_partial_link_text('Sign')
         """
-        return super().find_element(kwargs())
+        return super().find_element_by_partial_link_text(*args, **kwargs)
 
     @decorators.find_elements
-    def find_elements_by_partial_link_text(self, **kwargs):
+    def find_elements_by_partial_link_text(self, *args, **kwargs):
         """
         Finds elements by a partial match of their link text.
 
@@ -239,10 +257,10 @@ class WebDriverMixin:
         :Usage:
             elements = driver.find_elements_by_partial_link_text('Sign')
         """
-        return super().find_elements(**kwargs)
+        return super().find_elements_by_partial_link_text(*args, **kwargs)
 
     @decorators.find_element
-    def find_element_by_name(self, **kwargs):
+    def find_element_by_name(self, *args, **kwargs):
         """
         Finds an element by name.
 
@@ -258,10 +276,10 @@ class WebDriverMixin:
         :Usage:
             element = driver.find_element_by_name('foo')
         """
-        return super().find_element(**kwargs)
+        return super().find_element_by_name(*args, **kwargs)
 
     @decorators.find_elements
-    def find_elements_by_name(self, **kwargs):
+    def find_elements_by_name(self, *args, **kwargs):
         """
         Finds elements by name.
 
@@ -275,10 +293,10 @@ class WebDriverMixin:
         :Usage:
             elements = driver.find_elements_by_name('foo')
         """
-        return super().find_elements(**kwargs)
+        return super().find_elements_by_name(*args, **kwargs)
 
     @decorators.find_element
-    def find_element_by_tag_name(self, **kwargs):
+    def find_element_by_tag_name(self, *args, **kwargs):
         """
         Finds an element by tag name.
 
@@ -294,10 +312,10 @@ class WebDriverMixin:
         :Usage:
             element = driver.find_element_by_tag_name('h1')
         """
-        return super().find_element(**kwargs)
+        return super().find_element_by_tag_name(*args, **kwargs)
 
     @decorators.find_elements
-    def find_elements_by_tag_name(self, **kwargs):
+    def find_elements_by_tag_name(self, *args, **kwargs):
         """
         Finds elements by tag name.
 
@@ -311,10 +329,10 @@ class WebDriverMixin:
         :Usage:
             elements = driver.find_elements_by_tag_name('h1')
         """
-        return super().find_elements(**kwargs)
+        return super().find_elements_by_tag_name(*args, **kwargs)
 
     @decorators.find_element
-    def find_element_by_class_name(self, **kwargs):
+    def find_element_by_class_name(self, *args, **kwargs):
         """
         Finds an element by class name.
 
@@ -330,10 +348,10 @@ class WebDriverMixin:
         :Usage:
             element = driver.find_element_by_class_name('foo')
         """
-        return super().find_element(**kwargs)
+        return super().find_element_by_class_name(*args, **kwargs)
 
     @decorators.find_elements
-    def find_elements_by_class_name(self, **kwargs):
+    def find_elements_by_class_name(self, *args, **kwargs):
         """
         Finds elements by class name.
 
@@ -347,10 +365,10 @@ class WebDriverMixin:
         :Usage:
             elements = driver.find_elements_by_class_name('foo')
         """
-        return super().find_elements(**kwargs)
+        return super().find_elements_by_class_name(*args, **kwargs)
 
     @decorators.find_element
-    def find_element_by_css_selector(self, **kwargs):
+    def find_element_by_css_selector(self, *args, **kwargs):
         """
         Finds an element by css selector.
 
@@ -366,10 +384,10 @@ class WebDriverMixin:
         :Usage:
             element = driver.find_element_by_css_selector('#foo')
         """
-        return super().find_element(**kwargs)
+        return super().find_element_by_css_selector(*args, **kwargs)
 
     @decorators.find_elements
-    def find_elements_by_css_selector(self, **kwargs):
+    def find_elements_by_css_selector(self, *args, **kwargs):
         """
         Finds elements by css selector.
 
@@ -383,10 +401,10 @@ class WebDriverMixin:
         :Usage:
             elements = driver.find_elements_by_css_selector('.foo')
         """
-        return super()(**kwargs)
+        return super().find_elements_by_css_selector(*args, **kwargs)
 
     @decorators.find_element
-    def find_element(self, **kwargs):
+    def find_element(self, *args, **kwargs):
         """
         Find an element given a By strategy and locator. Prefer the find_element_by_* methods when
         possible.
@@ -396,10 +414,10 @@ class WebDriverMixin:
 
         :rtype: WebElement
         """
-        return super()(**kwargs)
+        return super().find_element(*args, **kwargs)
 
     @decorators.find_elements
-    def find_elements(self, **kwargs):
+    def find_elements(self, *args, **kwargs):
         """
         Find elements given a By strategy and locator. Prefer the find_elements_by_* methods when
         possible.
@@ -409,4 +427,4 @@ class WebDriverMixin:
 
         :rtype: list of WebElement
         """
-        return super()(**kwargs)
+        return super().find_elements(*args, **kwargs)

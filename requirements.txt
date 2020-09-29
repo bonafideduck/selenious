@@ -3,3 +3,21 @@
 setuptools 
 wheel
 selenium
+
+snapshottest
+
+pip>=20.0.2
+bump2version== 1.0.0
+watchdog==0.10.2
+flake8==3.7.9
+tox==3.14.5
+coverage==5.0.4
+Sphinx==2.4.4
+sphinxcontrib-napoleon==0.7
+twine==3.1.1
+ipython==7.13.0
+
+pytest==5.4.1
+pytest-cov==2.8.1
+pytest-runner==5.2
+
