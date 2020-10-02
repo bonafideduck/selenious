@@ -10,11 +10,20 @@ class WebDriverMixin:
     """
 
     def __init__(self, *args, **kwargs):
+        special_args = [
+            "timeout",
+            "poll_frequency",
+            "recover",
+            "implicit_wait",
+            "debounce",
+        ]
         self._selenious = namedtuple(
             "Selenius",
-            ["timeout", "poll_frequency", "recover", "implicit_wait", "debounce"],
+            special_args,
         )(0, 0.5, None, 0.0, 0.0)
-        super().__init__(*args, *args, **kwargs)
+        kwargs = {k: v for (k, v) in kwargs.items() if k not in special_args}
+        print(args, kwargs)
+        super().__init__(*args, **kwargs)
 
     def set_implicit_wait(self, time_to_wait):
         """
@@ -122,7 +131,7 @@ class WebDriverMixin:
         """Finds an element by id.
 
         :Args:
-         - id\_ - The id of the element to be found.
+         - id_ - The id of the element to be found.
 
         :Returns:
          - WebElement - the element if it was found
@@ -141,7 +150,7 @@ class WebDriverMixin:
         Finds multiple elements by id.
 
         :Args:
-         - id\_ - The id of the elements to be found.
+         - id_ - The id of the elements to be found.
 
         :Returns:
          - list of WebElement - a list with elements if any was found.  An

@@ -1,20 +1,30 @@
 from selenium.common.exceptions import NoSuchElementException
 import functools
-import time
+from time import sleep, monotonic
 from .helpers import validate_time_settings
 
 
 def find_element(func):
+    def next_state(prev_state, time_left, poll_frequency):
+        if time_left <= 0:
+            if prev_state == None:
+                return ("recover_or_raise", 0)
+            else:
+                return ("raise", None)
+
+        return ("recover_and_retry", min(time_left, poll_frequency))
+
     special_args = ("timeout", "poll_frequency", "recover")
 
     @functools.wraps(func)
     def find_element_decorator(self, *args, **kwargs):
-        func_kwargs = {k: v for (k, v) in kwargs.items() if args not in special_args}
+        func_kwargs = {k: v for (k, v) in kwargs.items() if k not in special_args}
         timeout = kwargs.get("timeout", self._selenious.timeout)
         poll_frequency = kwargs.get("poll_frequency", self._selenious.poll_frequency)
         recover = kwargs.get("recover", self._selenious.recover)
-        start_time = time.monotonic()
-        attempts = 1
+        start_time = monotonic()
+        state = None
+        attempts = 0
 
         validate_time_settings(self._selenious.implicit_wait, timeout, poll_frequency)
 
@@ -22,97 +32,114 @@ def find_element(func):
             try:
                 return func(self, *args, **func_kwargs)
             except NoSuchElementException as e:
-                if not recover and not timeout:
+                timestamp = monotonic()
+                time_left = timeout + start_time - timestamp
+                state, sleep_time = next_state(
+                    prev_state=state, time_left=time_left, poll_frequency=poll_frequency
+                )
+                if state == "raise" or (state == "recover_or_raise" and not recover):
                     raise
-            elapsed = time.monotonic() - start_time
+
+            attempts += 1
             if recover:
                 recover(
                     webdriver=self,
-                    function=func,
+                    function=func.__name__,
                     args=args,
                     kwargs=kwargs,
-                    elapased=elapsed,
+                    elapased=timestamp - start_time,
                     attempts=attempts,
                 )
-            time.sleep(max(0, min(timeout, poll_frequency)))
-            if not timeout:
-                recover = None
-            else:
-                if elapsed + poll_frequency >= timeout:
-                    timeout = 0
-            attempts += 1
+            sleep(sleep_time)
 
     return find_element_decorator
 
 
 def find_elements(func):
+    def next_state(
+        prev_state,
+        time_left,
+        poll_frequency,
+        debounce,
+        stable_time,
+        ismin,
+    ):
+        if ismin:
+            settle_time_remaining = debounce - stable_time
+            if settle_time_remaining > 0:
+                return ("debounce", settle_time_remaining)
+            else:
+                return ("success", None)
+
+        if time_left <= 0:
+            if prev_state == None:
+                return ("recover_or_raise", 0)
+            else:
+                return ("raise", None)
+
+        return ("recover_and_retry", min(time_left, poll_frequency))
+
     special_args = ("timeout", "poll_frequency", "recover", "min", "debounce")
 
     @functools.wraps(func)
     def find_elements_decorator(self, *args, **kwargs):
-        func_kwargs = {k: v for (k, v) in kwargs.items() if args not in special_args}
+        func_kwargs = {k: v for (k, v) in kwargs.items() if k not in special_args}
         timeout = kwargs.get("timeout", self._selenious.timeout)
         poll_frequency = kwargs.get("poll_frequency", self._selenious.poll_frequency)
         recover = kwargs.get("recover", self._selenious.recover)
         min = kwargs.get("min", 0)
         debounce = kwargs.get("debounce", self._selenious.debounce)
         debounce = poll_frequency if debounce is True else debounce
-        start_time = time.monotonic()
-        attempts = 1
+        start_time = monotonic()
+        attempts = 0
         prev_len = 0
         prev_time = start_time
+        state = None
 
         validate_time_settings(self._selenious.implicit_wait, timeout, poll_frequency)
 
         while True:
             retval = func(self, *args, **func_kwargs)
-            if not min and not debounce:
-                return retval
+            timestamp = monotonic()
+            attempts += 1
             length = len(retval)
-            now = None
-            debouncing = False
+            if length != prev_len:
+                prev_time = timestamp
+                prev_len = length
+                stable_time = 0
+            else:
+                stable_time = timestamp - prev_time
+            time_left = timeout + start_time - timestamp
+            ismin = prev_len >= min
 
-            if length >= min:
-                if debounce:
-                    if timeout:
-                        now = time.monotonic()
-                        elapsed = now - start_time
-                        if elapsed >= timeout:
-                            return retval
-                    if prev_len == length:
-                        now = now or time.monotonic()
-                        if now - prev_time >= debounce:
-                            return retval
-                    else:
-                        prev_len = length
-                        prev_start_time = now
-                    debouncing = True
-                else:
-                    return retval
-            elif min and not recover:
-                now = time.monotonic()
-                elapsed = now - start_time
-                if elapsed >= timeout:
-                    raise  NoSuchElementException(f'{length} elements is less than min of {min}')
+            state, sleep_time = next_state(
+                prev_state=state,
+                time_left=time_left,
+                poll_frequency=poll_frequency,
+                debounce=debounce,
+                stable_time=stable_time,
+                ismin=ismin,
+            )
 
-            now = now or time.monotonic()
-            elapsed = now - start_time
-            if recover:
+            if state == "success":
+                return retval
+
+            if state == "raise" or (state == "recover_or_raise" and not recover):
+                raise NoSuchElementException(
+                    f"{length} elements is less than min of {min}"
+                )
+
+            if state in ("recover_or_raise", "recover_and_retry") and recover:
                 recover(
                     webdriver=self,
                     function=func,
                     args=args,
                     kwargs=kwargs,
-                    elapased=elapsed,
+                    elapased=timestamp - start_time,
                     attempts=attempts,
                     elements=retval,
                 )
-            time.sleep(max(0, min(timeout, poll_frequency)))
-            if not timeout:
-                recover = None
-            else:
-                if elapsed + poll_frequency >= timeout:
-                    timeout = 0
-            attempts += 1
+            print('sleep_time', time_left, sleep_time)
+            sleep(sleep_time)
 
     return find_elements_decorator
