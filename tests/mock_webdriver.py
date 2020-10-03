@@ -19,6 +19,7 @@ def mock_fe(self, name, *args, **kwargs):
 
     return retval
 
+
 class MockWebDriver:
     def __init__(self, side_effect=None):
         self.side_effect = side_effect
@@ -78,7 +79,12 @@ class MockWebDriver:
     def find_elements(self, *args, **kwargs):
         return mock_fe(self, "find_elements", *args, **kwargs)
 
+    def implicitly_wait(self, *args, **kwargs):
+        return mock_fe(self, "implicitly_wait", *args, **kwargs)
+
+
 from unittest.mock import patch, MagicMock
+
 
 class UpcomingMockWebDriver:
     def __init__(self, side_effect=None):
@@ -100,6 +106,7 @@ class UpcomingMockWebDriver:
         self.find_elements_by_css_selector = MagicMock()
         self.find_element = MagicMock()
         self.find_elements = MagicMock()
+
 
 class MockDriver(WebDriverMixin, MockWebDriver):
     pass

@@ -48,7 +48,7 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .pytest_cache
 
 lint: ## check style with flake8
-	flake8 magic_dot tests
+	flake8 selenious tests
 
 test: ## run tests quickly with the default Python
 	pytest
@@ -57,15 +57,15 @@ test-all: ## run tests on every Python version with tox
 	tox
 
 coverage: ## check code coverage quickly with the default Python
-	coverage run --source magic_dot -m pytest
+	coverage run --source selenious -m pytest
 	coverage report -m
 	coverage html
 	$(BROWSER) htmlcov/index.html
 
 docs: ## generate Sphinx HTML documentation, including API docs
-	rm -f docs/magic_dot.rst
+	rm -f docs/selenious.rst
 	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ magic_dot
+	sphinx-apidoc -o docs/ selenious
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 	$(BROWSER) docs/_build/html/index.html

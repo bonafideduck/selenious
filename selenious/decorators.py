@@ -26,7 +26,7 @@ def find_element(func):
         state = None
         attempts = 0
 
-        validate_time_settings(self._selenious.implicit_wait, timeout, poll_frequency)
+        validate_time_settings(self._selenious.implicitly_wait, timeout, poll_frequency)
 
         while True:
             try:
@@ -96,7 +96,7 @@ def find_elements(func):
         prev_time = start_time
         state = None
 
-        validate_time_settings(self._selenious.implicit_wait, timeout, poll_frequency)
+        validate_time_settings(self._selenious.implicitly_wait, timeout, poll_frequency)
 
         while True:
             retval = func(self, *args, **func_kwargs)
@@ -139,7 +139,7 @@ def find_elements(func):
                     attempts=attempts,
                     elements=retval,
                 )
-            print('sleep_time', time_left, sleep_time)
+            print("sleep_time", time_left, sleep_time)
             sleep(sleep_time)
 
     return find_elements_decorator

@@ -1,11 +1,11 @@
-def validate_time_settings(implicit_wait, timeout, poll_frequency):
-    """Verifies that implicit_wait isn't larger than timeout or poll_frequency."""
-    if poll_frequency < implicit_wait:
+def validate_time_settings(implicitly_wait, timeout, poll_frequency):
+    """Verifies that implicitly_wait isn't larger than timeout or poll_frequency."""
+    if poll_frequency < implicitly_wait:
         raise TypeError(
-            f"Driver implicit_wait {implicit_wait} is longer than poll_frequency {poll_frequency}"
+            f"Driver implicitly_wait {implicitly_wait} is longer than poll_frequency {poll_frequency}"
         )
 
-    if timeout < implicit_wait:
+    if timeout > 0 and timeout < implicitly_wait:
         raise TypeError(
-            f"Driver implicit_wait {implicit_wait} is longer than timeout {timeout}"
+            f"Driver implicitly_wait {implicitly_wait} is longer than timeout {timeout}"
         )

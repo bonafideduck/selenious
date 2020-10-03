@@ -3,6 +3,16 @@ from .helpers import validate_time_settings
 from collections import namedtuple
 
 
+class _Selenious:
+    def __init__(self, **kwargs):
+        self.timeout = kwargs.get("timeout", 0)
+        self.poll_frequency = kwargs.get("poll_frequency", 0.5)
+        self.recover = kwargs.get("recover", None)
+        self.implicitly_wait = kwargs.get("implicitly_wait", 0.0)
+        self.debounce = kwargs.get("debounce", 0.0)
+        validate_time_settings(self.implicitly_wait, self.timeout, self.poll_frequency)
+
+
 class WebDriverMixin:
     """
     Enhances the selenium.webdriver.remote.webdriver.WebDriver
@@ -10,29 +20,20 @@ class WebDriverMixin:
     """
 
     def __init__(self, *args, **kwargs):
-        special_args = [
-            "timeout",
-            "poll_frequency",
-            "recover",
-            "implicit_wait",
-            "debounce",
-        ]
-        self._selenious = namedtuple(
-            "Selenius",
-            special_args,
-        )(0, 0.5, None, 0.0, 0.0)
-        kwargs = {k: v for (k, v) in kwargs.items() if k not in special_args}
-        print(args, kwargs)
+        self._selenious = _Selenious(**kwargs)
+
+        delete = ("timeout", "poll_frequency", "recover", "debounce")
+        kwargs = {k: v for (k, v) in kwargs.items() if k not in delete}
         super().__init__(*args, **kwargs)
 
-    def set_implicit_wait(self, time_to_wait):
+    def implicitly_wait(self, time_to_wait):
         """
         Sets a sticky timeout to implicitly wait for an element to be found,
            or a command to complete. This method only needs to be called one
            time per session. To set the timeout for calls to
            execute_async_script, see set_script_timeout.
 
-        Warning: The selenious package will fail if implicit_wait is larger
+        Warning: The selenious package will fail if implicitly_wait is larger
         than timeout or poll_frequency.  It is better to not set this and
         instead set_timeout.
 
@@ -46,8 +47,8 @@ class WebDriverMixin:
             time_to_wait, self._selenious.timeout, self._selenious.poll_frequency
         )
 
-        self._selenious.implicit_wait = time_to_wait
-        return super().set_implicit_wait(time_to_wait)
+        self._selenious.implicitly_wait = time_to_wait
+        return super().implicitly_wait(time_to_wait)
 
     def set_timeout(self, timeout):
         """Sets the default _selenious timout.
@@ -66,10 +67,10 @@ class WebDriverMixin:
           driver.set_timeout(5)
         """
         validate_time_settings(
-            self._selenious.implicit_wait, timeout, self._selenious.poll_frequency
+            self._selenious.implicitly_wait, timeout, self._selenious.poll_frequency
         )
 
-        self.selenius.timeout = timeout
+        self._selenious.timeout = timeout
 
     def set_debounce(self, debounce):
         """Sets the wait time for a select to have not changed.
@@ -83,7 +84,7 @@ class WebDriverMixin:
           driver.debounce(1.5)
         """
 
-        self.selenius.debounce = debounce
+        self._selenius.debounce = debounce
 
     def set_poll_frequency(self, poll_frequency):
         """Sets the frequency polling will happen for the timeout.
@@ -99,10 +100,10 @@ class WebDriverMixin:
           driver.set_poll_frequency(1.5)
         """
         validate_time_settings(
-            self._selenious.implicit_wait, self._selenious.timeout, poll_frequency
+            self._selenious.implicitly_wait, self._selenious.timeout, poll_frequency
         )
 
-        self.selenius.poll_frequency = poll_frequency
+        self._selenius.poll_frequency = poll_frequency
 
     def set_recover(self, recover):
         """Sets the recover function.
@@ -124,7 +125,7 @@ class WebDriverMixin:
           - elapsed - The time elapsed since the first attempt.
           - attempts - The number of attempts
         """
-        self.selenius.recover = recover
+        self._selenius.recover = recover
 
     @decorators.find_element
     def find_element_by_id(self, *args, **kwargs):

@@ -11,7 +11,7 @@ from .mock_webdriver import MockDriver
 from selenious import WebDriverMixin
 
 
-def test_can(snapshot):
+def test_all_find_el_are_wrapped(snapshot):
     """All find_* functions are wrapped."""
     driver = MockDriver()
     result = []
@@ -37,9 +37,38 @@ def test_can(snapshot):
     snapshot.assert_match(driver.calls)
 
 
+def test_time_validators():
+    driver = MockDriver(poll_frequency=5, timeout=3)
+    with pytest.raises(TypeError, match="timeout 3"):
+        driver.implicitly_wait(4)
+
+    driver = MockDriver()
+    with pytest.raises(TypeError, match="poll_frequency 0.5"):
+        driver.implicitly_wait(5)
+
+    driver = MockDriver(poll_frequency=5, timeout=3)
+    with pytest.raises(TypeError, match="timeout 3"):
+        driver.implicitly_wait(5)
+
+    driver = MockDriver()
+    with pytest.raises(TypeError, match="poll_frequency 0.5"):
+        driver.implicitly_wait(5)
+
+    driver = MockDriver()
+    driver.implicitly_wait(0.4)
+    with pytest.raises(TypeError, match="timeout 0.1"):
+        driver.set_timeout(0.1)
+
+    driver = MockDriver()
+    driver.implicitly_wait(0.4)
+    with pytest.raises(TypeError, match="poll_frequency 0.3"):
+        driver.set_poll_frequency(0.3)
+    
+
+
 def test_attached(snapshot, mocker):
     # https://changhsinlee.com/pytest-mock/
-    #mocker.patch("selenious.decorators.sleep")
+    # mocker.patch("selenious.decorators.sleep")
     print(type(mocker.patch("selenious.decorators.monotonic", side_effect=[1, 2, 3])))
     driver = MockDriver(timeout=3)
     driver.side_effect = [NoSuchElementException, NoSuchElementException, True]
