@@ -5,7 +5,7 @@ from selenium.common.exceptions import NoSuchElementException
 
 def mock_fe(self, name, *args, **kwargs):
     if self.side_effect:
-        index = min(len(self.side_effect) - 1, len(self.calls)-1)
+        index = min(len(self.side_effect) - 1, len(self.calls) - 1)
         retval = self.side_effect[index]
     elif name.startswith("find_elements"):
         retval = [True]
@@ -23,7 +23,9 @@ def mock_fe(self, name, *args, **kwargs):
 class MockWebDriver:
     def __init__(self, *args, side_effect=None, **kwargs):
         self.side_effect = side_effect
-        self.calls = [{"name": '__init__', "args": args, "kwargs":kwargs,"retval": "self" }]
+        self.calls = [
+            {"name": "__init__", "args": args, "kwargs": kwargs, "retval": "self"}
+        ]
 
     def find_element_by_id(self, *args, **kwargs):
         return mock_fe(self, "find_element_by_id", *args, **kwargs)

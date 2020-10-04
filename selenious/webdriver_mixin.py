@@ -3,7 +3,6 @@ from .helpers import validate_time_settings
 from collections import namedtuple
 
 
-
 class WebDriverMixin:
     """
     Enhances the selenium.webdriver.remote.webdriver.WebDriver
@@ -40,9 +39,7 @@ class WebDriverMixin:
         :Usage:
             driver.implicitly_wait(30)
         """
-        validate_time_settings(
-            time_to_wait, self.timeout, self.poll_frequency
-        )
+        validate_time_settings(time_to_wait, self.timeout, self.poll_frequency)
 
         self._implicitly_wait = time_to_wait
         return super().implicitly_wait(time_to_wait)
@@ -62,20 +59,17 @@ class WebDriverMixin:
 
     @timeout.setter
     def timeout(self, timeout):
-        validate_time_settings(
-            self._implicitly_wait, timeout, self._poll_frequency
-        )
+        validate_time_settings(self._implicitly_wait, timeout, self._poll_frequency)
         self._timeout = timeout
 
     @property
     def debounce(self):
         """The wait time for a select to have not changed."""
         return self._debounce
-        
+
     @debounce.setter
     def debounce(self, debounce):
         self._debounce = debounce
-
 
     @property
     def poll_frequency(self):
@@ -89,9 +83,7 @@ class WebDriverMixin:
 
     @poll_frequency.setter
     def poll_frequency(self, poll_frequency):
-        validate_time_settings(
-            self._implicitly_wait, self.timeout, poll_frequency
-        )
+        validate_time_settings(self._implicitly_wait, self.timeout, poll_frequency)
 
         self._poll_frequency = poll_frequency
 
