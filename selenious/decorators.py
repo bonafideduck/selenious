@@ -19,14 +19,14 @@ def find_element(func):
     @functools.wraps(func)
     def find_element_decorator(self, *args, **kwargs):
         func_kwargs = {k: v for (k, v) in kwargs.items() if k not in special_args}
-        timeout = kwargs.get("timeout", self._selenious.timeout)
-        poll_frequency = kwargs.get("poll_frequency", self._selenious.poll_frequency)
-        recover = kwargs.get("recover", self._selenious.recover)
+        timeout = kwargs.get("timeout", self.timeout)
+        poll_frequency = kwargs.get("poll_frequency", self.poll_frequency)
+        recover = kwargs.get("recover", self.recover)
         start_time = monotonic()
         state = None
         attempts = 0
 
-        validate_time_settings(self._selenious.implicitly_wait, timeout, poll_frequency)
+        validate_time_settings(self._implicitly_wait, timeout, poll_frequency)
 
         while True:
             try:
@@ -84,11 +84,11 @@ def find_elements(func):
     @functools.wraps(func)
     def find_elements_decorator(self, *args, **kwargs):
         func_kwargs = {k: v for (k, v) in kwargs.items() if k not in special_args}
-        timeout = kwargs.get("timeout", self._selenious.timeout)
-        poll_frequency = kwargs.get("poll_frequency", self._selenious.poll_frequency)
-        recover = kwargs.get("recover", self._selenious.recover)
+        timeout = kwargs.get("timeout", self.timeout)
+        poll_frequency = kwargs.get("poll_frequency", self.poll_frequency)
+        recover = kwargs.get("recover", self.recover)
         min = kwargs.get("min", 0)
-        debounce = kwargs.get("debounce", self._selenious.debounce)
+        debounce = kwargs.get("debounce", self.debounce)
         debounce = poll_frequency if debounce is True else debounce
         start_time = monotonic()
         attempts = 0
@@ -96,7 +96,7 @@ def find_elements(func):
         prev_time = start_time
         state = None
 
-        validate_time_settings(self._selenious.implicitly_wait, timeout, poll_frequency)
+        validate_time_settings(self._implicitly_wait, timeout, poll_frequency)
 
         while True:
             retval = func(self, *args, **func_kwargs)

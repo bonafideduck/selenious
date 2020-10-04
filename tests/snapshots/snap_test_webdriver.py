@@ -49,6 +49,14 @@ snapshots['test_all_find_el_are_wrapped 1'] = [
 snapshots['test_all_find_el_are_wrapped 2'] = [
     {
         'args': (
+        ),
+        'kwargs': {
+        },
+        'name': '__init__',
+        'retval': 'self'
+    },
+    {
+        'args': (
             'ignored'
         ,),
         'kwargs': {
@@ -228,5 +236,17 @@ snapshots['test_all_find_el_are_wrapped 2'] = [
         'retval': [
             True
         ]
+    }
+]
+
+snapshots['test_stripped_selenious_args 1'] = [
+    {
+        'args': (
+        ),
+        'kwargs': {
+            'implicitly_wait': 0.1
+        },
+        'name': '__init__',
+        'retval': 'self'
     }
 ]

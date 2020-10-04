@@ -3,15 +3,6 @@ from .helpers import validate_time_settings
 from collections import namedtuple
 
 
-class _Selenious:
-    def __init__(self, **kwargs):
-        self.timeout = kwargs.get("timeout", 0)
-        self.poll_frequency = kwargs.get("poll_frequency", 0.5)
-        self.recover = kwargs.get("recover", None)
-        self.implicitly_wait = kwargs.get("implicitly_wait", 0.0)
-        self.debounce = kwargs.get("debounce", 0.0)
-        validate_time_settings(self.implicitly_wait, self.timeout, self.poll_frequency)
-
 
 class WebDriverMixin:
     """
@@ -20,8 +11,14 @@ class WebDriverMixin:
     """
 
     def __init__(self, *args, **kwargs):
-        self._selenious = _Selenious(**kwargs)
-
+        self._timeout = kwargs.get("timeout", 0)
+        self._poll_frequency = kwargs.get("poll_frequency", 0.5)
+        self._recover = kwargs.get("recover", None)
+        self._debounce = kwargs.get("debounce", 0.0)
+        self._implicitly_wait = kwargs.get("implicitly_wait", 0.0)
+        validate_time_settings(
+            self._implicitly_wait, self._timeout, self._poll_frequency
+        )
         delete = ("timeout", "poll_frequency", "recover", "debounce")
         kwargs = {k: v for (k, v) in kwargs.items() if k not in delete}
         super().__init__(*args, **kwargs)
@@ -35,7 +32,7 @@ class WebDriverMixin:
 
         Warning: The selenious package will fail if implicitly_wait is larger
         than timeout or poll_frequency.  It is better to not set this and
-        instead set_timeout.
+        instead use the timeout property.
 
         :Args:
          - time_to_wait: Amount of time to wait (in seconds)
@@ -44,69 +41,63 @@ class WebDriverMixin:
             driver.implicitly_wait(30)
         """
         validate_time_settings(
-            time_to_wait, self._selenious.timeout, self._selenious.poll_frequency
+            time_to_wait, self.timeout, self.poll_frequency
         )
 
-        self._selenious.implicitly_wait = time_to_wait
+        self._implicitly_wait = time_to_wait
         return super().implicitly_wait(time_to_wait)
 
-    def set_timeout(self, timeout):
-        """Sets the default _selenious timout.
+    @property
+    def timeout(self):
+        """The default selenious timout.
 
         The selenium webdriver has an implicitly_wait() command that
         once set cannot be overwritten.  There is also a WebDriverWait()
         facility to allow requests with a wait.  This command moves
         an equivalent to that capability directly into the select commands.
-        You can specify a global wait timeout with set_timeout or pass
+        You can specify a global wait timeout with timeout property or pass
         a timeout parameter directly to the select command.
-
-        :Args:
-         - timeout - A number for the wait time for find commands.
-
-        :Usage:
-          driver.set_timeout(5)
         """
+        return self._timeout
+
+    @timeout.setter
+    def timeout(self, timeout):
         validate_time_settings(
-            self._selenious.implicitly_wait, timeout, self._selenious.poll_frequency
+            self._implicitly_wait, timeout, self._poll_frequency
         )
+        self._timeout = timeout
 
-        self._selenious.timeout = timeout
+    @property
+    def debounce(self):
+        """The wait time for a select to have not changed."""
+        return self._debounce
+        
+    @debounce.setter
+    def debounce(self, debounce):
+        self._debounce = debounce
 
-    def set_debounce(self, debounce):
-        """Sets the wait time for a select to have not changed.
 
-        :Args:
-        - debounce - Amount to wait for find_elements_* to not change.
-          This may also be set to True which will use the poll_frequency,
-          any falsey value will disable it.  By default it is 0.
-
-        :Usage:
-          driver.debounce(1.5)
-        """
-
-        self._selenius.debounce = debounce
-
-    def set_poll_frequency(self, poll_frequency):
-        """Sets the frequency polling will happen for the timeout.
+    @property
+    def poll_frequency(self):
+        """The frequency polling will happen for the timeout.
 
         This is similar to the WebDriverWait polling frequency.  See
         set_timeout() for differences.
-
-        :Args:
-        - poll_frequency - Sleep interval between calls.
-          By default, it is 0.5 second.
-
-        :Usage:
-          driver.set_poll_frequency(1.5)
         """
+
+        return self._poll_frequency
+
+    @poll_frequency.setter
+    def poll_frequency(self, poll_frequency):
         validate_time_settings(
-            self._selenious.implicitly_wait, self._selenious.timeout, poll_frequency
+            self._implicitly_wait, self.timeout, poll_frequency
         )
 
-        self._selenius.poll_frequency = poll_frequency
+        self._poll_frequency = poll_frequency
 
-    def set_recover(self, recover):
-        """Sets the recover function.
+    @property
+    def recover(self):
+        """The recover function.
 
         The recover function is run when a select fails or some
         actions like click fail.  The intent is to try to fix
@@ -125,7 +116,11 @@ class WebDriverMixin:
           - elapsed - The time elapsed since the first attempt.
           - attempts - The number of attempts
         """
-        self._selenius.recover = recover
+        return self._recover
+
+    @recover.setter
+    def recover(self, recover):
+        self._recover = recover
 
     @decorators.find_element
     def find_element_by_id(self, *args, **kwargs):
