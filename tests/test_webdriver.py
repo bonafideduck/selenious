@@ -9,6 +9,7 @@ from selenium.common.exceptions import NoSuchElementException
 
 from .mock_webdriver import MockDriver
 from selenious import WebDriverMixin
+from selenious import decorators
 
 
 def test_all_find_el_are_wrapped(snapshot):
@@ -86,15 +87,70 @@ def test_setters():
     assert driver.poll_frequency == 1
 
 
-def test_attached(snapshot, mocker):
-    # https://changhsinlee.com/pytest-mock/
-    # mocker.patch("selenious.decorators.sleep")
-    print(type(mocker.patch("selenious.decorators.monotonic", side_effect=[1, 2, 3])))
-    driver = MockDriver(timeout=3)
-    driver.side_effect = [NoSuchElementException, NoSuchElementException, True]
-    try:
-        driver.find_element_by_id("whatever")
-    except NoSuchElementException:
-        pass
-    print(driver.calls)
-    print("hello")
+@pytest.fixture
+def driver_plus_decorator_mocks(mocker):
+    driver = MockDriver(mocker)
+    mocker.patch("selenious.decorators.monotonic", driver.mock_monotonic)
+    mocker.patch(
+        "selenious.decorators._find_element_next_state", driver.mock_next_state
+    )
+    return driver
+
+
+def test_find_element_decorator_raise(snapshot, driver_plus_decorator_mocks):
+    """Tests the state machine to test that the driver handles a raise"""
+    driver = driver_plus_decorator_mocks
+    driver.side_effect = [0, NoSuchElementException, 99, ("raise", 0)]
+    with pytest.raises(NoSuchElementException):
+        driver.find_element_by_id("_")
+
+    snapshot.assert_match(driver.calls)
+
+
+def test_find_element_decorator_recover_or_raise_null(
+    snapshot, driver_plus_decorator_mocks
+):
+    """Tests the state machine to test that the driver handles a recover_or_raise with null recover"""
+    driver = driver_plus_decorator_mocks
+    driver.timeout = 200
+    driver.side_effect = [0, NoSuchElementException, 99, ("recover_or_raise", 0)]
+    with pytest.raises(NoSuchElementException):
+        driver.find_element_by_id("_")
+
+    snapshot.assert_match(driver.calls)
+
+
+
+def test_find_element_decorator_recover_or_raise_nonnull(
+    snapshot, driver_plus_decorator_mocks
+):
+    """Tests the state machine to test that the driver handles a recover_or_raise with nonnull recover"""
+    driver = driver_plus_decorator_mocks
+    driver.timeout = 200
+    driver.recover = MagicMock()
+    driver.side_effect = [0, NoSuchElementException, 99, ("recover_or_raise", 0), True]
+    driver.find_element_by_id("_")
+    driver.recover.assert_called()
+
+    snapshot.assert_match(driver.calls)
+
+
+# def test_find_elements_decorator_x(
+#     snapshot, driver_plus_decorator_mocks
+# ):
+#     """Tests the state machine to test that the driver handles a recover_or_raise with nonnull recover"""
+#     driver = driver_plus_decorator_mocks
+#     driver.recover = MagicMock()
+#     driver.side_effect = [0, NoSuchElementException, 1, ("recover_or_raise", 0), True]
+#     driver.find_elements_by_id("_")
+#     driver.recover.assert_called()
+
+#     snapshot.assert_match(driver.calls)
+
+    
+
+#     #         return ("debounce", settle_time_remaining)
+#     #         return ("success", None)
+#     #         return ("recover_or_raise", 0)
+#     #         return ("raise", None)
+#     # return ("recover_and_retry", min(time_left, poll_frequency))

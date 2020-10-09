@@ -84,6 +84,12 @@ class MockWebDriver:
     def implicitly_wait(self, *args, **kwargs):
         return mock_fe(self, "implicitly_wait", *args, **kwargs)
 
+    def mock_monotonic(self, *args, **kwargs):
+        return mock_fe(self, "monotonic", *args, **kwargs)
+
+    def mock_next_state(self, *args, **kwargs):
+        return mock_fe(self, "mock_next_state", *args, **kwargs)
+
 
 from unittest.mock import patch, MagicMock
 

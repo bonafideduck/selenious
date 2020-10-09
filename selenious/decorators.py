@@ -4,16 +4,17 @@ from time import sleep, monotonic
 from .helpers import validate_time_settings
 
 
+def _find_element_next_state(prev_state, time_left, poll_frequency):
+    if time_left <= 0:
+        if prev_state == None:
+            return ("recover_or_raise", 0)
+        else:
+            return ("raise", None)
+
+    return ("recover_and_retry", min(time_left, poll_frequency))
+
+
 def find_element(func):
-    def next_state(prev_state, time_left, poll_frequency):
-        if time_left <= 0:
-            if prev_state == None:
-                return ("recover_or_raise", 0)
-            else:
-                return ("raise", None)
-
-        return ("recover_and_retry", min(time_left, poll_frequency))
-
     special_args = ("timeout", "poll_frequency", "recover")
 
     @functools.wraps(func)
@@ -34,7 +35,7 @@ def find_element(func):
             except NoSuchElementException as e:
                 timestamp = monotonic()
                 time_left = timeout + start_time - timestamp
-                state, sleep_time = next_state(
+                state, sleep_time = _find_element_next_state(
                     prev_state=state, time_left=time_left, poll_frequency=poll_frequency
                 )
                 if state == "raise" or (state == "recover_or_raise" and not recover):
@@ -55,29 +56,31 @@ def find_element(func):
     return find_element_decorator
 
 
+def _find_elements_next_state(
+    prev_state,
+    time_left,
+    poll_frequency,
+    debounce,
+    stable_time,
+    ismin,
+):
+    if ismin:
+        settle_time_remaining = debounce - stable_time
+        if settle_time_remaining > 0:
+            return ("debounce", settle_time_remaining)
+        else:
+            return ("success", None)
+
+    if time_left <= 0:
+        if prev_state == None:
+            return ("recover_or_raise", 0)
+        else:
+            return ("raise", None)
+
+    return ("recover_and_retry", min(time_left, poll_frequency))
+
+
 def find_elements(func):
-    def next_state(
-        prev_state,
-        time_left,
-        poll_frequency,
-        debounce,
-        stable_time,
-        ismin,
-    ):
-        if ismin:
-            settle_time_remaining = debounce - stable_time
-            if settle_time_remaining > 0:
-                return ("debounce", settle_time_remaining)
-            else:
-                return ("success", None)
-
-        if time_left <= 0:
-            if prev_state == None:
-                return ("recover_or_raise", 0)
-            else:
-                return ("raise", None)
-
-        return ("recover_and_retry", min(time_left, poll_frequency))
 
     special_args = ("timeout", "poll_frequency", "recover", "min", "debounce")
 
@@ -112,7 +115,7 @@ def find_elements(func):
             time_left = timeout + start_time - timestamp
             ismin = prev_len >= min
 
-            state, sleep_time = next_state(
+            state, sleep_time = _find_elements_next_state(
                 prev_state=state,
                 time_left=time_left,
                 poll_frequency=poll_frequency,
