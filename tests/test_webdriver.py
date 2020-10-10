@@ -124,7 +124,6 @@ def test_find_element_decorator_recover_or_raise_null(
     snapshot.assert_match(driver.calls)
 
 
-
 def test_find_element_decorator_recover_or_raise_nonnull(
     snapshot, driver_plus_decorator_mocks
 ):
@@ -132,21 +131,35 @@ def test_find_element_decorator_recover_or_raise_nonnull(
     driver = driver_plus_decorator_mocks
     driver.timeout = 200
     driver.recover = MagicMock()
-    driver.side_effect = [0, NoSuchElementException, 99, ("recover_or_raise", 0), None, True]
+    driver.side_effect = [
+        0,
+        NoSuchElementException,
+        99,
+        ("recover_or_raise", 0),
+        None,
+        True,
+    ]
     driver.find_element_by_id("_")
     driver.recover.assert_called()
 
     snapshot.assert_match(driver.calls)
 
 
-def test_find_elements_decorator_debounce(
-    snapshot, driver_plus_decorator_mocks
-):
+def test_find_elements_decorator_debounce(snapshot, driver_plus_decorator_mocks):
     """Tests the state machine to test that the driver handles a debounce,"""
     driver = driver_plus_decorator_mocks
     driver.debounce = 0.1
     driver.recover = MagicMock()
-    driver.side_effect = [0, [], 1, ("debounce", 1), None, [1,2,3], 99, ("success", 0)]
+    driver.side_effect = [
+        0,
+        [],
+        1,
+        ("debounce", 1),
+        None,
+        [1, 2, 3],
+        99,
+        ("success", 0),
+    ]
     driver.find_elements_by_id("_", min=3, timeout=200)
     driver.recover.assert_not_called()
 
@@ -160,11 +173,21 @@ def test_find_elements_decorator_recover_or_raise_recover(
     driver = driver_plus_decorator_mocks
     driver.debounce = 0.1
     driver.recover = MagicMock()
-    driver.side_effect = [0, [], 1, ("recover_or_raise", 1), None, [1,2,3], 99, ("success", 0)]
+    driver.side_effect = [
+        0,
+        [],
+        1,
+        ("recover_or_raise", 1),
+        None,
+        [1, 2, 3],
+        99,
+        ("success", 0),
+    ]
     driver.find_elements_by_id("_", min=3, timeout=200)
     driver.recover.assert_called()
 
     snapshot.assert_match(driver.calls)
+
 
 def test_find_elements_decorator_recover_or_raise_no_recover(
     snapshot, driver_plus_decorator_mocks
@@ -177,11 +200,9 @@ def test_find_elements_decorator_recover_or_raise_no_recover(
         driver.find_elements_by_id("_", min=3, timeout=200)
 
     snapshot.assert_match(driver.calls)
-   
 
-def test_find_elements_decorator_raise(
-    snapshot, driver_plus_decorator_mocks
-):
+
+def test_find_elements_decorator_raise(snapshot, driver_plus_decorator_mocks):
     """Tests the state machine to test that the driver handles a raise"""
     driver = driver_plus_decorator_mocks
     driver.debounce = 0.1
@@ -199,11 +220,21 @@ def test_find_elements_decorator_recover_and_retry_recover(
     driver = driver_plus_decorator_mocks
     driver.recover = MagicMock()
     driver.debounce = 0.1
-    driver.side_effect = [0, [], 1, ("recover_and_retry", 1), None, [1,2,3], 99, ("success", 0)]
+    driver.side_effect = [
+        0,
+        [],
+        1,
+        ("recover_and_retry", 1),
+        None,
+        [1, 2, 3],
+        99,
+        ("success", 0),
+    ]
     driver.find_elements_by_id("_", min=3, timeout=200)
     driver.recover.assert_called()
 
     snapshot.assert_match(driver.calls)
+
 
 def test_find_elements_decorator_recover_and_retry_no_recover(
     snapshot, driver_plus_decorator_mocks
@@ -211,7 +242,16 @@ def test_find_elements_decorator_recover_and_retry_no_recover(
     """Tests the state machine to test that the driver handles a recover_and_retry with recover"""
     driver = driver_plus_decorator_mocks
     driver.debounce = 0.1
-    driver.side_effect = [0, [], 1, ("recover_and_retry", 1), None, [1,2,3], 99, ("success", 0)]
+    driver.side_effect = [
+        0,
+        [],
+        1,
+        ("recover_and_retry", 1),
+        None,
+        [1, 2, 3],
+        99,
+        ("success", 0),
+    ]
     driver.find_elements_by_id("_", min=3, timeout=200)
 
     snapshot.assert_match(driver.calls)

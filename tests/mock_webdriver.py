@@ -93,5 +93,6 @@ class MockWebDriver:
     def mock_sleep(self, *args, **kwargs):
         return mock_fe(self, "mock_sleep", *args, **kwargs)
 
+
 class MockDriver(WebDriverMixin, MockWebDriver):
     pass
