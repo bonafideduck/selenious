@@ -257,3 +257,45 @@ def test_find_elements_decorator_recover_and_retry_no_recover(
     snapshot.assert_match(driver.calls)
 
     # return ("recover_and_retry", min(time_left, poll_frequency))
+
+
+def test_find_element_next_state():
+    f = decorators._find_element_next_state
+    # f(prev_state, time_left, poll_frequency) == (next_state, sleep_time)
+    assert f(None, 10, 0.5) == ("recover_and_retry", 0.5)
+    assert f(None, 0, 0.5) == ("recover_or_raise", 0.0)
+    assert f("recover_and_retry", 10, 1.0) == ("recover_and_retry", 1.0)
+    assert f("recover_and_retry", 0.5, 1.0) == ("recover_and_retry", 0.5)
+    assert f("recover_and_retry", 0, 1.0) == ("raise", None)
+    assert f("recover_or_raise", 0, 1.0) == ("raise", None)
+
+
+def test_find_elements_next_state():
+    f = decorators._find_elements_next_state
+    e = Exception('this should not have been accessed')
+    # f(prev_state, time_left, poll_frequency, debounce, stable_time, ismin) == (next_state, sleep_time)
+    assert f(e, e, e, 1, 1, True) == ("success", None)
+    assert f(e, e, e, 1, 0.75, True) == ("debounce", 0.25)
+    assert f('debounce', 0, e, e, e, False) == ("raise", None)
+    assert f('recover_or_raise', 0, e, e, e, False) == ("raise", None)
+    assert f('recover_and_retry', 0, e, e, e, False) == ("raise", None)
+    assert f(None, 0, e, e, e, False) == ("recover_or_raise", 0)
+    assert f(e, 1, 0.5, e, e, False) == ("recover_and_retry", 0.5)
+    assert f(e, 1, 1.5, e, e, False) == ("recover_and_retry", 1.0)
+
+
+    # if ismin:
+    #     settle_time_remaining = debounce - stable_time
+    #     if settle_time_remaining > 0:
+    #         return ("debounce", settle_time_remaining)
+    #     else:
+    #         return ("success", None)
+
+    # if time_left <= 0:
+    #     if prev_state == None:
+    #         return ("recover_or_raise", 0)
+    #     else:
+    #         return ("raise", None)
+
+    # return ("recover_and_retry", min(time_left, poll_frequency))
+
