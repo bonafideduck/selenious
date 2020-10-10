@@ -90,31 +90,8 @@ class MockWebDriver:
     def mock_next_state(self, *args, **kwargs):
         return mock_fe(self, "mock_next_state", *args, **kwargs)
 
-
-from unittest.mock import patch, MagicMock
-
-
-class UpcomingMockWebDriver:
-    def __init__(self, side_effect=None):
-        self.find_element_by_id = MagicMock()
-        self.find_elements_by_id = MagicMock()
-        self.find_element_by_xpath = MagicMock()
-        self.find_elements_by_xpath = MagicMock()
-        self.find_element_by_link_text = MagicMock()
-        self.find_elements_by_link_text = MagicMock()
-        self.find_element_by_partial_link_text = MagicMock()
-        self.find_elements_by_partial_link_text = MagicMock()
-        self.find_element_by_name = MagicMock()
-        self.find_elements_by_name = MagicMock()
-        self.find_element_by_tag_name = MagicMock()
-        self.find_elements_by_tag_name = MagicMock()
-        self.find_element_by_class_name = MagicMock()
-        self.find_elements_by_class_name = MagicMock()
-        self.find_element_by_css_selector = MagicMock()
-        self.find_elements_by_css_selector = MagicMock()
-        self.find_element = MagicMock()
-        self.find_elements = MagicMock()
-
+    def mock_sleep(self, *args, **kwargs):
+        return mock_fe(self, "mock_sleep", *args, **kwargs)
 
 class MockDriver(WebDriverMixin, MockWebDriver):
     pass

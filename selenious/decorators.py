@@ -142,7 +142,6 @@ def find_elements(func):
                     attempts=attempts,
                     elements=retval,
                 )
-            print("sleep_time", time_left, sleep_time)
             sleep(sleep_time)
 
     return find_elements_decorator
