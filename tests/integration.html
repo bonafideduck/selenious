@@ -1,0 +1,20 @@
+<head>
+  <script>
+    window.addEventListener('load', (event) => {
+        let ul = document.querySelector("ul");
+        for (let i=0; i<10; i++) {
+            setTimeout(() => {
+                let li = document.createElement('li');
+                li.id = `li-${i * 1000}`;
+                li.innerText = `Delay: ${i * 1000}`;
+                ul.appendChild(li);
+            }, i * 1000);
+        }
+    });
+  </script>
+</head>
+
+<body>
+  <ul>
+  </ul>
+</body>

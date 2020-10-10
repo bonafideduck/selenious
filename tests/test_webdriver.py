@@ -283,19 +283,3 @@ def test_find_elements_next_state():
     assert f(e, 1, 0.5, e, e, False) == ("recover_and_retry", 0.5)
     assert f(e, 1, 1.5, e, e, False) == ("recover_and_retry", 1.0)
 
-
-    # if ismin:
-    #     settle_time_remaining = debounce - stable_time
-    #     if settle_time_remaining > 0:
-    #         return ("debounce", settle_time_remaining)
-    #     else:
-    #         return ("success", None)
-
-    # if time_left <= 0:
-    #     if prev_state == None:
-    #         return ("recover_or_raise", 0)
-    #     else:
-    #         return ("raise", None)
-
-    # return ("recover_and_retry", min(time_left, poll_frequency))
-
