@@ -6,9 +6,8 @@ import os
 import time
 
 import pytest
-from selenious import WebDriverMixin
+from selenious.webdriver import Chrome
 from selenium.common.exceptions import NoSuchElementException
-from selenium.webdriver import Chrome
 
 
 class Test:
@@ -16,9 +15,7 @@ class Test:
         file = os.path.join(os.getcwd(), "tests", "integration.html")
         assert(os.path.exists(file))
         self.path = f'file://{file}'
-        class Selenious(WebDriverMixin, Chrome):
-            pass
-        self.browser = Selenious()
+        self.browser = Chrome()
 
     def teardown_method(self, test_method):
         self.browser.close()
