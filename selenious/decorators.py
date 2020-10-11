@@ -6,7 +6,7 @@ from .helpers import validate_time_settings
 
 def _find_element_next_state(prev_state, time_left, poll_frequency):
     if time_left <= 0:
-        if prev_state == None:
+        if prev_state is None:
             return ("recover_or_raise", 0)
         else:
             return ("raise", None)
@@ -32,7 +32,7 @@ def find_element(func):
         while True:
             try:
                 return func(self, *args, **func_kwargs)
-            except NoSuchElementException as e:
+            except NoSuchElementException:
                 timestamp = monotonic()
                 time_left = timeout + start_time - timestamp
                 state, sleep_time = _find_element_next_state(
@@ -72,7 +72,7 @@ def _find_elements_next_state(
             return ("success", None)
 
     if time_left <= 0:
-        if prev_state == None:
+        if prev_state is None:
             return ("recover_or_raise", 0)
         else:
             return ("raise", None)

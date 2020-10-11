@@ -1,6 +1,5 @@
 from . import decorators
 from .helpers import validate_time_settings
-from collections import namedtuple
 
 
 class WebDriverMixin:
@@ -403,8 +402,8 @@ class WebDriverMixin:
     @decorators.find_element
     def find_element(self, *args, **kwargs):
         """
-        Find an element given a By strategy and locator. Prefer the find_element_by_* methods when
-        possible.
+        Find an element given a By strategy and locator. Prefer the find_element_by_*
+        methods when possible.
 
         :Usage:
             element = driver.find_element(By.ID, 'foo')
@@ -416,8 +415,8 @@ class WebDriverMixin:
     @decorators.find_elements
     def find_elements(self, *args, **kwargs):
         """
-        Find elements given a By strategy and locator. Prefer the find_elements_by_* methods when
-        possible.
+        Find elements given a By strategy and locator. Prefer the find_elements_by_*
+        methods when possible.
 
         :Usage:
             elements = driver.find_elements(By.CLASS_NAME, 'foo')

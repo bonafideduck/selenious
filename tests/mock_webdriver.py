@@ -1,4 +1,3 @@
-import functools
 from selenious import WebDriverMixin
 from selenium.common.exceptions import NoSuchElementException
 

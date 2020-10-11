@@ -3,12 +3,10 @@
 """Tests for `selenious` decorators package."""
 
 import pytest
-from collections import namedtuple
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock
 from selenium.common.exceptions import NoSuchElementException
 
 from .mock_webdriver import MockDriver
-from selenious import WebDriverMixin
 from selenious import decorators
 
 
@@ -114,7 +112,8 @@ def test_find_element_decorator_raise(snapshot, driver_plus_decorator_mocks):
 def test_find_element_decorator_recover_or_raise_null(
     snapshot, driver_plus_decorator_mocks
 ):
-    """Tests the state machine to test that the driver handles a recover_or_raise with null recover"""
+    """Tests the state machine to test that the driver handles a recover_or_raise with
+    null recover"""
     driver = driver_plus_decorator_mocks
     driver.timeout = 200
     driver.side_effect = [0, NoSuchElementException, 99, ("recover_or_raise", 0)]
@@ -127,7 +126,8 @@ def test_find_element_decorator_recover_or_raise_null(
 def test_find_element_decorator_recover_or_raise_nonnull(
     snapshot, driver_plus_decorator_mocks
 ):
-    """Tests the state machine to test that the driver handles a recover_or_raise with nonnull recover"""
+    """Tests the state machine to test that the driver handles a recover_or_raise with
+    nonnull recover"""
     driver = driver_plus_decorator_mocks
     driver.timeout = 200
     driver.recover = MagicMock()
@@ -169,7 +169,8 @@ def test_find_elements_decorator_debounce(snapshot, driver_plus_decorator_mocks)
 def test_find_elements_decorator_recover_or_raise_recover(
     snapshot, driver_plus_decorator_mocks
 ):
-    """Tests the state machine to test that the driver handles a recover_or_raise with nonnull recover"""
+    """Tests the state machine to test that the driver handles a recover_or_raise with
+    nonnull recover"""
     driver = driver_plus_decorator_mocks
     driver.debounce = 0.1
     driver.recover = MagicMock()
@@ -192,7 +193,8 @@ def test_find_elements_decorator_recover_or_raise_recover(
 def test_find_elements_decorator_recover_or_raise_no_recover(
     snapshot, driver_plus_decorator_mocks
 ):
-    """Tests the state machine to test that the driver handles a recover_or_raise with null recover"""
+    """Tests the state machine to test that the driver handles a recover_or_raise
+    with null recover"""
     driver = driver_plus_decorator_mocks
     driver.debounce = 0.1
     driver.side_effect = [0, [], 1, ("recover_or_raise", 1)]
@@ -216,7 +218,8 @@ def test_find_elements_decorator_raise(snapshot, driver_plus_decorator_mocks):
 def test_find_elements_decorator_recover_and_retry_recover(
     snapshot, driver_plus_decorator_mocks
 ):
-    """Tests the state machine to test that the driver handles a recover_and_retry with recover"""
+    """Tests the state machine to test that the driver handles a recover_and_retry
+    with recover"""
     driver = driver_plus_decorator_mocks
     driver.recover = MagicMock()
     driver.debounce = 0.1
@@ -239,7 +242,8 @@ def test_find_elements_decorator_recover_and_retry_recover(
 def test_find_elements_decorator_recover_and_retry_no_recover(
     snapshot, driver_plus_decorator_mocks
 ):
-    """Tests the state machine to test that the driver handles a recover_and_retry with recover"""
+    """Tests the state machine to test that the driver handles a recover_and_retry
+    with recover"""
     driver = driver_plus_decorator_mocks
     driver.debounce = 0.1
     driver.side_effect = [
@@ -272,14 +276,14 @@ def test_find_element_next_state():
 
 def test_find_elements_next_state():
     f = decorators._find_elements_next_state
-    e = Exception('this should not have been accessed')
-    # f(prev_state, time_left, poll_frequency, debounce, stable_time, ismin) == (next_state, sleep_time)
+    e = Exception("this should not have been accessed")
+    # f(prev_state, time_left, poll_frequency, debounce, stable_time, ismin) ==
+    # (next_state, sleep_time)
     assert f(e, e, e, 1, 1, True) == ("success", None)
     assert f(e, e, e, 1, 0.75, True) == ("debounce", 0.25)
-    assert f('debounce', 0, e, e, e, False) == ("raise", None)
-    assert f('recover_or_raise', 0, e, e, e, False) == ("raise", None)
-    assert f('recover_and_retry', 0, e, e, e, False) == ("raise", None)
+    assert f("debounce", 0, e, e, e, False) == ("raise", None)
+    assert f("recover_or_raise", 0, e, e, e, False) == ("raise", None)
+    assert f("recover_and_retry", 0, e, e, e, False) == ("raise", None)
     assert f(None, 0, e, e, e, False) == ("recover_or_raise", 0)
     assert f(e, 1, 0.5, e, e, False) == ("recover_and_retry", 0.5)
     assert f(e, 1, 1.5, e, e, False) == ("recover_and_retry", 1.0)
-
