@@ -129,7 +129,7 @@ def find_elements(func):
 
             if state == "raise" or (state == "recover_or_raise" and not recover):
                 raise NoSuchElementException(
-                    f"{length} elements is less than min of {min}"
+                    "{} elements is less than min of {}".format(length, min)
                 )
 
             if state in ("recover_or_raise", "recover_and_retry") and recover:

@@ -14,7 +14,7 @@ class Test:
     def setup_method(self, test_method):
         file = os.path.join(os.getcwd(), "tests", "integration.html")
         assert os.path.exists(file)
-        self.path = f"file://{file}"
+        self.path = "file://{}".format(file)
         self.browser = Chrome()
 
     def teardown_method(self, test_method):
