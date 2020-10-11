@@ -8,7 +8,7 @@ with open("HISTORY.rst") as history_file:
 
 setup_args = dict(
     name="selenious",
-    verwion="0.0.0",
+    verwion="version="0.1.0"",
     description="Enhancement to Selenium WebDriver for timeouts and more.",
     long_description_content_type="text/markdown",
     long_description=README + "\n\n" + HISTORY,
