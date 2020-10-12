@@ -35,17 +35,17 @@ a ``min`` count.
 Selenium already has an ``implicitly_wait`` and a ``WebDriverWait`` function.
 Neither of these have the versatility and natural feel that Selenious add
 to the code.  To add a 5 second timeout to a single call, Selenious would
-be:
+be::
 
     driver.find_element_by_id('popup', timeout=5)
 
-While with ``implicitly_wait`` the code would be
+While with ``implicitly_wait`` the code would be::
 
     driver.implicitly_wait(5)
     driver.find_element_by_id('popup')
     driver.implicitly_wait(hopefully_you_know_what_the_setting_was_before)
 
-And ``WebDriverWait`` would be 
+And ``WebDriverWait`` would be::
 
     WebDriverWait(driver, 5).until(
         EC.presence_of_element_located((By.ID, "popup"))
