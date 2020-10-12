@@ -18,7 +18,7 @@ Selenious
 
 
 
-Library that allows deep extraction of layered data structures (like JSON).
+Enhances Selenium with timeouts and recover capabilities.
 
 
 * Free software: BSD license
