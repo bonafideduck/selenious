@@ -29,12 +29,12 @@ Introduction
 ============
 
 Selenious enhances Selenium WebDriver ``find_element*`` functions to have a
-``timeout``, ``debounce``, ``poll_frequency``, ``recover``, and for ``find_elements*``, 
-a ``min`` count.
+``timeout``, ``poll_frequency``, and ``recover``.  The ``find_elements*``
+functions are additionally enhanced with ``debounce`` and ``min`` settings.
 
 Selenium already has an ``implicitly_wait`` and a ``WebDriverWait`` function.
-Neither of these have the versatility and natural feel that Selenious add
-to the code.  To add a 5 second timeout to a single call, Selenious would
+Neither of these have the versatility and natural feel that Selenious gives
+the code.  To add a 5 second timeout to a single call, Selenious would
 be::
 
     driver.find_element_by_id('popup', timeout=5)
