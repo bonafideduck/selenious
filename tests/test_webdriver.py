@@ -85,6 +85,27 @@ def test_setters():
     assert driver.poll_frequency == 1
 
 
+def test_recover_raises_exception():
+    def except_recover(**kwargs):
+        raise NoSuchElementException('new exception')
+
+    driver = MockDriver(
+        recover=except_recover,
+    )
+    driver.side_effect = [NoSuchElementException, []]
+    with pytest.raises(NoSuchElementException, match='new exception'):
+        driver.find_element_by_id('_')
+    
+    # The recover should have been restored
+    assert driver.recover == except_recover
+    
+    with pytest.raises(NoSuchElementException, match='new exception'):
+        driver.find_elements_by_id('_', min=1)
+    
+    # The recover should have been restored
+    assert driver.recover == except_recover
+  
+
 @pytest.fixture
 def driver_plus_decorator_mocks(mocker):
     driver = MockDriver(mocker)
@@ -287,3 +308,4 @@ def test_find_elements_next_state():
     assert f(None, 0, e, e, e, False) == ("recover_or_raise", 0)
     assert f(e, 1, 0.5, e, e, False) == ("recover_and_retry", 0.5)
     assert f(e, 1, 1.5, e, e, False) == ("recover_and_retry", 1.0)
+

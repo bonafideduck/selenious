@@ -43,14 +43,22 @@ def find_element(func):
 
             attempts += 1
             if recover:
-                recover(
-                    webdriver=self,
-                    function=func.__name__,
-                    args=args,
-                    kwargs=kwargs,
-                    elapased=timestamp - start_time,
-                    attempts=attempts,
-                )
+                save = self.recover
+                self.recover = None
+                try:
+                    recover(
+                        webdriver=self,
+                        function=func.__name__,
+                        args=args,
+                        kwargs=kwargs,
+                        elapased=timestamp - start_time,
+                        attempts=attempts,
+                    )
+
+                except: # noqa E722
+                    self.recover = save
+                    raise
+                self.recover = save
             sleep(sleep_time)
 
     return find_element_decorator
@@ -133,15 +141,24 @@ def find_elements(func):
                 )
 
             if state in ("recover_or_raise", "recover_and_retry") and recover:
-                recover(
-                    webdriver=self,
-                    function=func,
-                    args=args,
-                    kwargs=kwargs,
-                    elapased=timestamp - start_time,
-                    attempts=attempts,
-                    elements=retval,
-                )
+                save = self.recover
+                self.recover = None
+                try:
+                    recover(
+                        webdriver=self,
+                        function=func,
+                        args=args,
+                        kwargs=kwargs,
+                        elapased=timestamp - start_time,
+                        attempts=attempts,
+                        elements=retval,
+                    )
+
+                except: # noqa E722
+                    self.recover = save
+                    raise
+
+                self.recover = save
             sleep(sleep_time)
 
     return find_elements_decorator
