@@ -2,6 +2,7 @@ from selenium.common.exceptions import NoSuchElementException
 import functools
 from time import sleep, monotonic
 from .helpers import validate_time_settings
+from .recover import RecoverData, RecoverFuncId
 
 
 def _find_element_next_state(prev_state, time_left, poll_frequency):
@@ -30,9 +31,12 @@ def find_element(func):
         validate_time_settings(self._implicitly_wait, timeout, poll_frequency)
 
         while True:
+            exception = None
             try:
-                return func(self, *args, **func_kwargs)
-            except NoSuchElementException:
+                from .webelement import SeleniousWrapWebElement
+
+                return SeleniousWrapWebElement(func(self, *args, **func_kwargs))
+            except NoSuchElementException as e:
                 timestamp = monotonic()
                 time_left = timeout + start_time - timestamp
                 state, sleep_time = _find_element_next_state(
@@ -40,22 +44,37 @@ def find_element(func):
                 )
                 if state == "raise" or (state == "recover_or_raise" and not recover):
                     raise
+                exception = e
 
             attempts += 1
             if recover:
                 save = self.recover
                 self.recover = None
-                try:
-                    recover(
-                        webdriver=self,
-                        function=func.__name__,
-                        args=args,
-                        kwargs=kwargs,
-                        elapased=timestamp - start_time,
-                        attempts=attempts,
-                    )
+                from .webdriver_mixin import WebDriverMixin
 
-                except: # noqa E722
+                if isinstance(self, WebDriverMixin):
+                    webdriver = self
+                    element = None
+                    func_id = RecoverFuncId.FIND_ELEMENT
+                else:
+                    webdriver = self.parent
+                    element = self
+                    func_id = RecoverFuncId.ELEMENT_FIND_ELEMENT
+
+                recover_data = RecoverData(
+                    webdriver=webdriver,
+                    element=element,
+                    func_id=func_id,
+                    function=func,
+                    args=args,
+                    kwargs=kwargs,
+                    elapsed=timestamp - start_time,
+                    attempts=attempts,
+                    exception=exception,
+                )
+                try:
+                    recover(recover_data)
+                except:  # noqa E722
                     self.recover = save
                     raise
                 self.recover = save
@@ -133,7 +152,9 @@ def find_elements(func):
             )
 
             if state == "success":
-                return retval
+                from .webelement import SeleniousWrapWebElement
+
+                return [SeleniousWrapWebElement(e) for e in retval]
 
             if state == "raise" or (state == "recover_or_raise" and not recover):
                 raise NoSuchElementException(
@@ -143,18 +164,30 @@ def find_elements(func):
             if state in ("recover_or_raise", "recover_and_retry") and recover:
                 save = self.recover
                 self.recover = None
-                try:
-                    recover(
-                        webdriver=self,
-                        function=func,
-                        args=args,
-                        kwargs=kwargs,
-                        elapased=timestamp - start_time,
-                        attempts=attempts,
-                        elements=retval,
-                    )
+                from .webdriver_mixin import WebDriverMixin
 
-                except: # noqa E722
+                if isinstance(self, WebDriverMixin):
+                    webdriver = self
+                    element = None
+                    func_id = RecoverFuncId.FIND_ELEMENTS
+                else:
+                    webdriver = self.parent
+                    element = self
+                    func_id = RecoverFuncId.ELEMENT_FIND_ELEMENTS
+                recover_data = RecoverData(
+                    webdriver=webdriver,
+                    func_id=func_id,
+                    function=func,
+                    element=element,
+                    args=args,
+                    kwargs=kwargs,
+                    elapsed=timestamp - start_time,
+                    attempts=attempts,
+                    elements=retval,
+                )
+                try:
+                    recover(recover_data)
+                except:  # noqa E722
                     self.recover = save
                     raise
 

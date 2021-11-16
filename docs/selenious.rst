@@ -36,6 +36,14 @@ selenious.webdriver\_mixin module
    :undoc-members:
    :show-inheritance:
 
+selenious.webelement module
+---------------------------
+
+.. automodule:: selenious.webelement
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 
 Module contents
 ---------------

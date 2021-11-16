@@ -6,7 +6,7 @@ import pytest
 from unittest.mock import MagicMock
 from selenium.common.exceptions import NoSuchElementException
 
-from .mock_webdriver import MockDriver
+from .mock_webdriver import MockDriver, MockWebElement
 from selenious import decorators
 
 
@@ -86,25 +86,25 @@ def test_setters():
 
 
 def test_recover_raises_exception():
-    def except_recover(**kwargs):
-        raise NoSuchElementException('new exception')
+    def except_recover(recover_data):
+        raise NoSuchElementException("new exception")
 
     driver = MockDriver(
         recover=except_recover,
     )
     driver.side_effect = [NoSuchElementException, []]
-    with pytest.raises(NoSuchElementException, match='new exception'):
-        driver.find_element_by_id('_')
-    
+    with pytest.raises(NoSuchElementException, match="new exception"):
+        driver.find_element_by_id("_")
+
     # The recover should have been restored
     assert driver.recover == except_recover
-    
-    with pytest.raises(NoSuchElementException, match='new exception'):
-        driver.find_elements_by_id('_', min=1)
-    
+
+    with pytest.raises(NoSuchElementException, match="new exception"):
+        driver.find_elements_by_id("_", min=1)
+
     # The recover should have been restored
     assert driver.recover == except_recover
-  
+
 
 @pytest.fixture
 def driver_plus_decorator_mocks(mocker):
@@ -123,7 +123,7 @@ def driver_plus_decorator_mocks(mocker):
 def test_find_element_decorator_raise(snapshot, driver_plus_decorator_mocks):
     """Tests the state machine to test that the driver handles a raise"""
     driver = driver_plus_decorator_mocks
-    driver.side_effect = [0, NoSuchElementException, 99, ("raise", 0)]
+    driver.side_effect = [0, NoSuchElementException, 99, ("raise", MockWebElement())]
     with pytest.raises(NoSuchElementException):
         driver.find_element_by_id("_")
 
@@ -137,7 +137,12 @@ def test_find_element_decorator_recover_or_raise_null(
     null recover"""
     driver = driver_plus_decorator_mocks
     driver.timeout = 200
-    driver.side_effect = [0, NoSuchElementException, 99, ("recover_or_raise", 0)]
+    driver.side_effect = [
+        0,
+        NoSuchElementException,
+        99,
+        ("recover_or_raise", MockWebElement()),
+    ]
     with pytest.raises(NoSuchElementException):
         driver.find_element_by_id("_")
 
@@ -156,9 +161,9 @@ def test_find_element_decorator_recover_or_raise_nonnull(
         0,
         NoSuchElementException,
         99,
-        ("recover_or_raise", 0),
+        ("recover_or_raise", MockWebElement()),
         None,
-        True,
+        MockWebElement(),
     ]
     driver.find_element_by_id("_")
     driver.recover.assert_called()
@@ -175,11 +180,11 @@ def test_find_elements_decorator_debounce(snapshot, driver_plus_decorator_mocks)
         0,
         [],
         1,
-        ("debounce", 1),
+        ("debounce", MockWebElement()),
         None,
-        [1, 2, 3],
+        [MockWebElement(), MockWebElement(), MockWebElement()],
         99,
-        ("success", 0),
+        ("success", MockWebElement()),
     ]
     driver.find_elements_by_id("_", min=3, timeout=200)
     driver.recover.assert_not_called()
@@ -199,11 +204,11 @@ def test_find_elements_decorator_recover_or_raise_recover(
         0,
         [],
         1,
-        ("recover_or_raise", 1),
+        ("recover_or_raise", MockWebElement()),
         None,
-        [1, 2, 3],
+        [MockWebElement(), MockWebElement(), MockWebElement()],
         99,
-        ("success", 0),
+        ("success", MockWebElement()),
     ]
     driver.find_elements_by_id("_", min=3, timeout=200)
     driver.recover.assert_called()
@@ -218,7 +223,7 @@ def test_find_elements_decorator_recover_or_raise_no_recover(
     with null recover"""
     driver = driver_plus_decorator_mocks
     driver.debounce = 0.1
-    driver.side_effect = [0, [], 1, ("recover_or_raise", 1)]
+    driver.side_effect = [0, [], 1, ("recover_or_raise", MockWebElement())]
     with pytest.raises(NoSuchElementException):
         driver.find_elements_by_id("_", min=3, timeout=200)
 
@@ -229,7 +234,7 @@ def test_find_elements_decorator_raise(snapshot, driver_plus_decorator_mocks):
     """Tests the state machine to test that the driver handles a raise"""
     driver = driver_plus_decorator_mocks
     driver.debounce = 0.1
-    driver.side_effect = [0, [], 1, ("raise", 1)]
+    driver.side_effect = [0, [], 1, ("raise", MockWebElement())]
     with pytest.raises(NoSuchElementException):
         driver.find_elements_by_id("_", min=3, timeout=200)
 
@@ -248,11 +253,11 @@ def test_find_elements_decorator_recover_and_retry_recover(
         0,
         [],
         1,
-        ("recover_and_retry", 1),
+        ("recover_and_retry", MockWebElement()),
         None,
-        [1, 2, 3],
+        [MockWebElement(), MockWebElement(), MockWebElement()],
         99,
-        ("success", 0),
+        ("success", MockWebElement()),
     ]
     driver.find_elements_by_id("_", min=3, timeout=200)
     driver.recover.assert_called()
@@ -271,11 +276,11 @@ def test_find_elements_decorator_recover_and_retry_no_recover(
         0,
         [],
         1,
-        ("recover_and_retry", 1),
+        ("recover_and_retry", MockWebElement()),
         None,
-        [1, 2, 3],
+        [MockWebElement(), MockWebElement(), MockWebElement()],
         99,
-        ("success", 0),
+        ("success", MockWebElement()),
     ]
     driver.find_elements_by_id("_", min=3, timeout=200)
 
@@ -308,4 +313,3 @@ def test_find_elements_next_state():
     assert f(None, 0, e, e, e, False) == ("recover_or_raise", 0)
     assert f(e, 1, 0.5, e, e, False) == ("recover_and_retry", 0.5)
     assert f(e, 1, 1.5, e, e, False) == ("recover_and_retry", 1.0)
-

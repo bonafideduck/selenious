@@ -1,48 +1,18 @@
 from . import decorators
 from .helpers import validate_time_settings
 from selenium.webdriver.common.by import By
+from .recover import RecoverData, RecoverFuncId
 
 
-class WebDriverMixin:
-    """
-    Enhances the selenium.webdriver.remote.webdriver.WebDriver
-    with several enhanced capabilities.
-    """
+class SeleniousWebElementMixin:
+    _timeout = None
+    _poll_frequency = None
+    _recover = None
+    _debounce = None
 
-    def __init__(self, *args, **kwargs):
-        self._timeout = kwargs.get("timeout", 0)
-        self._poll_frequency = kwargs.get("poll_frequency", 0.5)
-        self._recover = kwargs.get("recover", None)
-        self._debounce = kwargs.get("debounce", 0.0)
-        self._implicitly_wait = kwargs.get("implicitly_wait", 0.0)
-        validate_time_settings(
-            self._implicitly_wait, self._timeout, self._poll_frequency
-        )
-        delete = ("timeout", "poll_frequency", "recover", "debounce")
-        kwargs = {k: v for (k, v) in kwargs.items() if k not in delete}
-        super().__init__(*args, **kwargs)
-
-    def implicitly_wait(self, time_to_wait):
-        """
-        Sets a sticky timeout to implicitly wait for an element to be found,
-           or a command to complete. This method only needs to be called one
-           time per session. To set the timeout for calls to
-           execute_async_script, see set_script_timeout.
-
-        Warning: The selenious package will fail if implicitly_wait is larger
-        than timeout or poll_frequency.  It is better to not set this and
-        instead use the timeout property.
-
-        :Args:
-         - time_to_wait: Amount of time to wait (in seconds)
-
-        :Usage:
-            driver.implicitly_wait(30)
-        """
-        validate_time_settings(time_to_wait, self.timeout, self.poll_frequency)
-
-        self._implicitly_wait = time_to_wait
-        return super().implicitly_wait(time_to_wait)
+    @property
+    def _implicitly_wait(self):
+        return self.parent._implicitly_wait
 
     @property
     def timeout(self):
@@ -55,17 +25,23 @@ class WebDriverMixin:
         You can specify a global wait timeout with timeout property or pass
         a timeout parameter directly to the select command.
         """
-        return self._timeout
+        if self._timeout is None:
+            return self.parent.timeout
+        else:
+            return self._timeout
 
     @timeout.setter
     def timeout(self, timeout):
-        validate_time_settings(self._implicitly_wait, timeout, self._poll_frequency)
+        validate_time_settings(self._implicitly_wait, timeout, self.poll_frequency)
         self._timeout = timeout
 
     @property
     def debounce(self):
         """The wait time for a select to have not changed."""
-        return self._debounce
+        if self._debounce is None:
+            return self.parent.debounce
+        else:
+            return self._debounce
 
     @debounce.setter
     def debounce(self, debounce):
@@ -79,12 +55,14 @@ class WebDriverMixin:
         set_timeout() for differences.
         """
 
-        return self._poll_frequency
+        if self._poll_frequency is None:
+            return self.parent.poll_frequency
+        else:
+            return self._poll_frequency
 
     @poll_frequency.setter
     def poll_frequency(self, poll_frequency):
         validate_time_settings(self._implicitly_wait, self.timeout, poll_frequency)
-
         self._poll_frequency = poll_frequency
 
     @property
@@ -102,13 +80,16 @@ class WebDriverMixin:
 
         :Args:
         - recover - The recover function to be run.  Parameters are:
-          - webdriver - This webdriver (self)
-          - function - The function calling the recover function.
-          - kwargs - The kwargs sent to the function
-          - elapsed - The time elapsed since the first attempt.
-          - attempts - The number of attempts
+        - webdriver - This webdriver (self.parent)
+        - function - The function calling the recover function.
+        - kwargs - The kwargs sent to the function
+        - elapsed - The time elapsed since the first attempt.
+        - attempts - The number of attempts
         """
-        return self._recover
+        if self._recover is None:
+            return self.parent.recover
+        else:
+            return self._recover
 
     @recover.setter
     def recover(self, recover):
@@ -121,19 +102,19 @@ class WebDriverMixin:
         """
         Finds an element by selenium.webdriver.common.by and value.
         :Args:
-         - by - One of By.ID (default), By.XPATH, By.LINK_TEXT, By.PARTIAL_LINK_TEXT,
-                   By.NAME, By.TAG_NAME, By.CLASS_NAME, By.CSS_SELECTOR
-         - value - The value to search for.
-         - timeout - The timeout to wait for element.
-           Default is WebDriverMixin.timeout (0.0)
-         - poll_frequency - How often to poll Selenious for the element if there is a timeout.
-           Default is WebDriverMixin.poll_frequency (0.5)
-         - recover - A function called after each poll (but not the last)
-           Default is WebDriverMixin.recover (None)
+        - by - One of By.ID (default), By.XPATH, By.LINK_TEXT, By.PARTIAL_LINK_TEXT,
+                By.NAME, By.TAG_NAME, By.CLASS_NAME, By.CSS_SELECTOR
+        - value - The value to search for.
+        - timeout - The timeout to wait for element.
+        Default is WebDriverMixin.timeout (0.0)
+        - poll_frequency - How often to poll Selenious for the element if there is a timeout.
+        Default is WebDriverMixin.poll_frequency (0.5)
+        - recover - A function called after each poll (but not the last)
+        Default is WebDriverMixin.recover (None)
         :Returns:
-         - SeleniousWebElement - the element if it was found
+        - SeleniousWebElement - the element if it was found
         :Raises:
-         - NoSuchElementException - if the element wasn't found
+        - NoSuchElementException - if the element wasn't found
         :Usage:
             ::
                 element = driver.find_element(By.ID, 'foo')
@@ -154,19 +135,19 @@ class WebDriverMixin:
         """
         Finds multiple elements by selenium.webdriver.common.by and value.
         :Args:
-         - by - One of By.ID (default), By.XPATH, By.LINK_TEXT, By.PARTIAL_LINK_TEXT,
-           By.NAME, By.TAG_NAME, By.CLASS_NAME, By.CSS_SELECTOR
-         - value - The value to search for.
-         - timeout - The timeout to wait for min elements.  Default is WebDriverMixin.timeout (0)
-         - poll_frequency - How often to poll Selenious for the element if there
-           is a timeout.  Default is WebDriverMixin.poll_frequency (0.5)
-         - recover - A function called after each poll (but not the last)
-           Default is WebDriverMixin.recover (None)        :Returns:
-         - list of SeleniousWebElement - the element if it was found. An
-           empty list if not
-         - min - The minimum number of elements to wait for.  Default is 0.
-         - debounce - A time to wait for the number of elements to not change.
-           Default is WebDriverMixin.debounce (0.0)
+        - by - One of By.ID (default), By.XPATH, By.LINK_TEXT, By.PARTIAL_LINK_TEXT,
+        By.NAME, By.TAG_NAME, By.CLASS_NAME, By.CSS_SELECTOR
+        - value - The value to search for.
+        - timeout - The timeout to wait for min elements.  Default is WebDriverMixin.timeout (0)
+        - poll_frequency - How often to poll Selenious for the element if there
+        is a timeout.  Default is WebDriverMixin.poll_frequency (0.5)
+        - recover - A function called after each poll (but not the last)
+        Default is WebDriverMixin.recover (None)        :Returns:
+        - list of SeleniousWebElement - the element if it was found. An
+        empty list if not
+        - min - The minimum number of elements to wait for.  Default is 0.
+        - debounce - A time to wait for the number of elements to not change.
+        Default is WebDriverMixin.debounce (0.0)
         :Usage:
             ::
                 elements = driver.find_elements(By.ID, 'foo')
@@ -268,3 +249,44 @@ class WebDriverMixin:
         calls find_elements(By.CSS_SELECTOR, css_selector, **kwargs)
         """
         return self.find_elements(By.CSS_SELECTOR, css_selector, **kwargs)
+
+    def click(self, recover=None):
+        """[summary]
+
+        Args:
+            recover (function): A function to be called once if the click fails. Defaults to self.recover (None).
+
+        The recover selenious enhancement works similar to the find_element[s]() recover function
+        except that it is only called once if it exists.
+        """
+        try:
+            return super().click()
+        except Exception as e:
+            recover_cmd = recover or self.recover
+            if not recover_cmd:
+                raise
+            recover_data = RecoverData(
+                webdriver=self.parent,
+                element=self,
+                function=self.click,
+                func_id=RecoverFuncId.ELEMENT_CLICK,
+                args=[],
+                kwargs={"recover": recover},
+                exception=e,
+            )
+            recover_cmd(recover_data)
+            return super().click()
+
+
+__element_maps = {}
+
+
+def SeleniousWrapWebElement(instance):
+    if not isinstance(instance, SeleniousWebElementMixin):
+        cls = instance.__class__
+        if cls not in __element_maps:
+            __element_maps[cls] = type(
+                "SeleniousWebElement", (SeleniousWebElementMixin, cls), {}
+            )
+        instance.__class__ = __element_maps[cls]
+    return instance

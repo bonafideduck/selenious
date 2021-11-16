@@ -255,11 +255,101 @@ snapshots['test_all_find_el_are_wrapped 2'] = [
     }
 ]
 
+snapshots['test_click_no_recover_excepts 1'] = [
+    {
+        'args': (
+        ),
+        'kwargs': {
+        },
+        'name': '__init__',
+        'retval': 'self'
+    },
+    {
+        'args': (
+        ),
+        'kwargs': {
+        },
+        'name': 'click',
+        'retval': GenericRepr("<class 'selenium.common.exceptions.NoSuchElementException'>")
+    }
+]
+
+snapshots['test_click_recover_fails 1'] = [
+    {
+        'args': (
+        ),
+        'kwargs': {
+        },
+        'name': '__init__',
+        'retval': 'self'
+    },
+    {
+        'args': (
+        ),
+        'kwargs': {
+        },
+        'name': 'click',
+        'retval': GenericRepr("<class 'selenium.common.exceptions.NoSuchElementException'>")
+    },
+    {
+        'args': (
+            GenericRepr('<selenious.recover.RecoverData object at 0x100000000>')
+        ,),
+        'kwargs': {
+        },
+        'name': 'recover',
+        'retval': None
+    },
+    {
+        'args': (
+        ),
+        'kwargs': {
+        },
+        'name': 'click',
+        'retval': GenericRepr("<class 'selenium.common.exceptions.NoSuchElementException'>")
+    }
+]
+
+snapshots['test_click_recover_succeeds 1'] = [
+    {
+        'args': (
+        ),
+        'kwargs': {
+        },
+        'name': '__init__',
+        'retval': 'self'
+    },
+    {
+        'args': (
+        ),
+        'kwargs': {
+        },
+        'name': 'click',
+        'retval': GenericRepr("<class 'selenium.common.exceptions.NoSuchElementException'>")
+    },
+    {
+        'args': (
+            GenericRepr('<selenious.recover.RecoverData object at 0x100000000>')
+        ,),
+        'kwargs': {
+        },
+        'name': 'recover',
+        'retval': None
+    },
+    {
+        'args': (
+        ),
+        'kwargs': {
+        },
+        'name': 'click',
+        'retval': None
+    }
+]
+
 snapshots['test_find_element_decorator_raise 1'] = [
     {
         'args': (
-            GenericRepr('<pytest_mock.plugin.MockerFixture object at 0x100000000>')
-        ,),
+        ),
         'kwargs': {
         },
         'name': '__init__',
@@ -310,8 +400,7 @@ snapshots['test_find_element_decorator_raise 1'] = [
 snapshots['test_find_element_decorator_recover_or_raise_nonnull 1'] = [
     {
         'args': (
-            GenericRepr('<pytest_mock.plugin.MockerFixture object at 0x100000000>')
-        ,),
+        ),
         'kwargs': {
         },
         'name': '__init__',
@@ -381,8 +470,7 @@ snapshots['test_find_element_decorator_recover_or_raise_nonnull 1'] = [
 snapshots['test_find_element_decorator_recover_or_raise_null 1'] = [
     {
         'args': (
-            GenericRepr('<pytest_mock.plugin.MockerFixture object at 0x100000000>')
-        ,),
+        ),
         'kwargs': {
         },
         'name': '__init__',
@@ -433,8 +521,7 @@ snapshots['test_find_element_decorator_recover_or_raise_null 1'] = [
 snapshots['test_find_elements_decorator_debounce 1'] = [
     {
         'args': (
-            GenericRepr('<pytest_mock.plugin.MockerFixture object at 0x100000000>')
-        ,),
+        ),
         'kwargs': {
         },
         'name': '__init__',
@@ -537,8 +624,7 @@ snapshots['test_find_elements_decorator_debounce 1'] = [
 snapshots['test_find_elements_decorator_raise 1'] = [
     {
         'args': (
-            GenericRepr('<pytest_mock.plugin.MockerFixture object at 0x100000000>')
-        ,),
+        ),
         'kwargs': {
         },
         'name': '__init__',
@@ -593,8 +679,7 @@ snapshots['test_find_elements_decorator_raise 1'] = [
 snapshots['test_find_elements_decorator_recover_and_retry_no_recover 1'] = [
     {
         'args': (
-            GenericRepr('<pytest_mock.plugin.MockerFixture object at 0x100000000>')
-        ,),
+        ),
         'kwargs': {
         },
         'name': '__init__',
@@ -697,8 +782,7 @@ snapshots['test_find_elements_decorator_recover_and_retry_no_recover 1'] = [
 snapshots['test_find_elements_decorator_recover_and_retry_recover 1'] = [
     {
         'args': (
-            GenericRepr('<pytest_mock.plugin.MockerFixture object at 0x100000000>')
-        ,),
+        ),
         'kwargs': {
         },
         'name': '__init__',
@@ -801,8 +885,7 @@ snapshots['test_find_elements_decorator_recover_and_retry_recover 1'] = [
 snapshots['test_find_elements_decorator_recover_or_raise_no_recover 1'] = [
     {
         'args': (
-            GenericRepr('<pytest_mock.plugin.MockerFixture object at 0x100000000>')
-        ,),
+        ),
         'kwargs': {
         },
         'name': '__init__',
@@ -857,8 +940,7 @@ snapshots['test_find_elements_decorator_recover_or_raise_no_recover 1'] = [
 snapshots['test_find_elements_decorator_recover_or_raise_recover 1'] = [
     {
         'args': (
-            GenericRepr('<pytest_mock.plugin.MockerFixture object at 0x100000000>')
-        ,),
+        ),
         'kwargs': {
         },
         'name': '__init__',
@@ -955,17 +1037,5 @@ snapshots['test_find_elements_decorator_recover_or_raise_recover 1'] = [
             'success',
             GenericRepr('MockWebElement')
         )
-    }
-]
-
-snapshots['test_stripped_selenious_args 1'] = [
-    {
-        'args': (
-        ),
-        'kwargs': {
-            'implicitly_wait': 0.1
-        },
-        'name': '__init__',
-        'retval': 'self'
     }
 ]

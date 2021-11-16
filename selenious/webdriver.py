@@ -1,60 +1,99 @@
-from selenium.webdriver import Firefox, FirefoxProfile, FirefoxOptions  # noqa: F401
-from selenium.webdriver import Chrome, ChromeOptions  # noqa: F401
-from selenium.webdriver import Ie, IeOptions  # noqa: F401
-from selenium.webdriver import Edge
-from selenium.webdriver import Opera
-from selenium.webdriver import Safari
-from selenium.webdriver import BlackBerry
-from selenium.webdriver import PhantomJS
-from selenium.webdriver import Android
-from selenium.webdriver import WebKitGTK, WebKitGTKOptions  # noqa: F401
-from selenium.webdriver import Remote
-from selenium.webdriver import DesiredCapabilities  # noqa: F401
-from selenium.webdriver import ActionChains  # noqa: F401
-from selenium.webdriver import TouchActions  # noqa: F401
-from selenium.webdriver import Proxy  # noqa: F401
 from .webdriver_mixin import WebDriverMixin
 
+from selenium.webdriver import Remote
+from selenium import webdriver
 
-class Firefox(WebDriverMixin, Firefox):
+
+Remote = type("Remote", (WebDriverMixin, Remote), {})
+
+try:
+    Firefox = type("Firefox", (WebDriverMixin, webdriver.Firefox), {})
+    FirefoxProfile = webdriver.FirefoxProfile
+    FirefoxOptions = webdriver.FirefoxOptions
+except AttributeError:
     pass
 
-
-class Chrome(WebDriverMixin, Chrome):
+try:
+    Chrome = type("Chrome", (WebDriverMixin, webdriver.Chrome), {})
+    ChromeOptions = webdriver.ChromeOptions
+except AttributeError:
     pass
 
-
-class Ie(WebDriverMixin, Ie):
+try:
+    Ie = type("Ie", (WebDriverMixin, webdriver.Ie), {})
+    IeOptions = webdriver.IeOptions
+except AttributeError:
     pass
 
-
-class Edge(WebDriverMixin, Edge):
+try:
+    Edge = type("Edge", (WebDriverMixin, webdriver.Edge), {})
+    EdgeOptions = webdriver.EdgeOptions
+except AttributeError:
     pass
 
-
-class Opera(WebDriverMixin, Opera):
+try:
+    ChromiumEdge = type("ChromiumEdge", (WebDriverMixin, webdriver.ChromiumEdge), {})
+except AttributeError:
     pass
 
-
-class Safari(WebDriverMixin, Safari):
+try:
+    Opera = type("Opera", (WebDriverMixin, webdriver.Opera), {})
+except AttributeError:
     pass
 
-
-class BlackBerry(WebDriverMixin, BlackBerry):
+try:
+    Safari = type("Safari", (WebDriverMixin, webdriver.Safari), {})
+except AttributeError:
     pass
 
-
-class PhantomJS(WebDriverMixin, PhantomJS):
+try:
+    Blackberry = type("Blackberry", (WebDriverMixin, webdriver.Blackberry), {})
+except AttributeError:
     pass
 
-
-class Android(WebDriverMixin, Android):
+try:
+    PhantomJS = type("PhantomJS", (WebDriverMixin, webdriver.PhantomJS), {})
+except AttributeError:
     pass
 
-
-class WebKitGTK(WebDriverMixin, WebKitGTK):
+try:
+    Android = type("Android", (WebDriverMixin, webdriver.Android), {})
+except AttributeError:
     pass
 
+try:
+    WebKitGTK = type("WebKitGTK", (WebDriverMixin, webdriver.WebKitGTK), {})
+    WebKitGTKOptions = webdriver.WebKitGTKOptions
+except AttributeError:
+    pass
 
-class Remote(WebDriverMixin, Remote):
+try:
+    WPEWebKit = type("WPEWebKit", (WebDriverMixin, webdriver.WPEWebKit), {})
+    WPEWebKitOptions = webdriver.WPEWebKitOptions
+except AttributeError:
+    pass
+
+try:
+    DesiredCapabilities = webdriver.DesiredCapabilities
+except AttributeError:
+    pass
+
+try:
+    ActionChains = webdriver.ActionChains
+except AttributeError:
+    pass
+
+try:
+    TouchActions = webdriver.TouchActions
+except AttributeError:
+    pass
+
+try:
+    Proxy = webdriver.Proxy
+except AttributeError:
+    pass
+
+try:
+    Keys = webdriver.Keys
+except AttributeError:
     pass
