@@ -10,7 +10,6 @@ setup_args = dict(
     name="selenious",
     version="0.2.0",
     description="Enhancement to Selenium WebDriver for timeouts and more.",
-    long_description_content_type="text/x-rst",
     long_description=README + "\n\n" + HISTORY,
     license="MIT",
     packages=find_packages(),
