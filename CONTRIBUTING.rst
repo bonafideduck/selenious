@@ -38,8 +38,8 @@ and "help wanted" is open to whoever wants to implement it.
 Write Documentation
 ~~~~~~~~~~~~~~~~~~~
 
-Magic Dot could always use more documentation, whether as part of the
-official Magic Dot docs, in docstrings, or even on the web in blog posts,
+Selenious could always use more documentation, whether as part of the
+official Selenious docs, in docstrings, or even on the web in blog posts,
 articles, and such.
 
 Submit Feedback

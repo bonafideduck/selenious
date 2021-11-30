@@ -81,6 +81,26 @@ Settings can be set in the function or globally
 Locally, `webdriver.find_element_by_id('id', timeout=5)`, or globaly,
 ``webdriver.timeout = 5``.
 
+
+Support of recover() for click()
+-------------------------------
+
+If a click() command raises an exception, if set, the `recover()` function 
+will be called once and the click attempted again.  This allows for recovering
+from such events as a modal popup being shown or the button has scrolled out
+of view.
+
+
+No deprecation of the find_element[s]_by_* methods
+--------------------------------------------------
+
+The developers of selenium have made the decision to deprecate redundant
+functions such as `find_element_by_id(id_)` with the common function
+and a `By` parameter.  `find_element(By.ID, id_)`.  Selenious will continue
+to support these convenience functions and not print a warning.
+
+
+
 Credits
 =======
 

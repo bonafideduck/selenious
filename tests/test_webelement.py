@@ -7,7 +7,6 @@ from unittest.mock import MagicMock
 from selenium.common.exceptions import NoSuchElementException
 
 from .mock_webdriver import MockDriver, MockWebElement
-from selenious import decorators
 
 
 def test_all_find_el_are_wrapped(snapshot):

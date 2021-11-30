@@ -20,6 +20,14 @@ selenious.helpers module
    :undoc-members:
    :show-inheritance:
 
+selenious.recover module
+------------------------
+
+.. automodule:: selenious.recover
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 selenious.webdriver module
 --------------------------
 
@@ -43,7 +51,6 @@ selenious.webelement module
    :members:
    :undoc-members:
    :show-inheritance:
-
 
 Module contents
 ---------------

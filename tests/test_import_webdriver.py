@@ -1,8 +1,5 @@
 #!/usr/bin/env python
-
 """Tests for `selenious` decorators package."""
-
-import pytest
 
 
 def test_import():
@@ -20,4 +17,4 @@ def skip_test_import_asserts():
     sys.path.insert(0, os.path.join(os.getcwd(), "tests/mock_selenium"))
     from selenious import webdriver
 
-    assert webdriver.Remote is "defined"
+    assert webdriver.Remote == "defined"
