@@ -111,7 +111,7 @@ Tips
 
 To run a subset of tests::
 
-$ pytest tests.integration
+$ pytest tests/integration.py
 
 
 Deploying
