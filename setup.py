@@ -1,9 +1,9 @@
 from setuptools import setup, find_packages
 
-with open("README.rst") as readme_file:
+with open("README.md") as readme_file:
     README = readme_file.read()
 
-with open("selenious/HISTORY.rst") as history_file:
+with open("selenious/HISTORY.md") as history_file:
     HISTORY = history_file.read()
 
 setup_args = dict(
@@ -11,6 +11,7 @@ setup_args = dict(
     version="0.2.1",
     description="Enhancement to Selenium WebDriver for timeouts and more.",
     long_description=README + "\n\n" + HISTORY,
+    long_description_content_type='text/markdown',
     license="MIT",
     packages=find_packages(),
     package_data={"": ["*.rst"]},
