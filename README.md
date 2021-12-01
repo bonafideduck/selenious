@@ -1,22 +1,9 @@
-Selenious
-*********
+# Selenious
 
-
-.. image:: https://img.shields.io/pypi/v/selenious.svg
-        :target: https://pypi.python.org/pypi/selenious
-
-.. image:: https://img.shields.io/pypi/dm/selenious.svg
-        :target: https://pypi.python.org/pypi/selenious
-
-.. image:: https://github.com/bonafideduck/selenious/workflows/Sanity/badge.svg
-        :target: https://github.com/bonafideduck/selenious/actions?query=branch%3Amaster+workflow%3A%22Sanity%22
-
-.. image:: https://readthedocs.org/projects/selenious/badge/?version=latest
-        :target: https://selenious.readthedocs.io/en/latest/?badge=latest
-        :alt: Documentation Status
-
-
-
+[![version](https://img.shields.io/pypi/v/selenious.svg)](https://pypi.python.org/pypi/selenious)
+[![downloads](https://img.shields.io/pypi/dm/selenious.svg)](https://pypi.python.org/pypi/selenious)
+[![sanity](https://github.com/bonafideduck/selenious/workflows/Sanity/badge.svg)](https://github.com/bonafideduck/selenious/actions?query=branch%3Amaster+workflow%3A%22Sanity%22)
+[![docs](https://readthedocs.org/projects/selenious/badge/?version=latest)](https://selenious.readthedocs.io/en/latest/?badge=latest)
 
 Enhances Selenium with timeouts and recover capabilities.
 
@@ -106,5 +93,5 @@ Credits
 
 This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
 
-.. _Cookiecutter: https://github.com/audreyr/cookiecutter
-.. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
+* [Cookiecutter](https://github.com/audreyr/cookiecutter)
+* [`audreyr/cookiecutter-pypackage`](https://github.com/audreyr/cookiecutter-pypackage)

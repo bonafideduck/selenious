@@ -1,1 +1,1 @@
-.. include:: ../selenious/HISTORY.rst
+.. include:: ../selenious/HISTORY.md
