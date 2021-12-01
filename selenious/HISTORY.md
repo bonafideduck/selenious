@@ -1,6 +1,10 @@
 History
 *******
 
+0.2.1 (2021-11-30)
+==================
+* Documentation enhancements
+
 0.2.0 (2021-11-28)
 ==================
 * Add element.find_element[s]*() function support.
